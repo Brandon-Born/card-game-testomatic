@@ -13,6 +13,9 @@ export const createPlayerId = (): PlayerId => ({ value: uuidv4() })
 export const createGameId = (): GameId => ({ value: uuidv4() })
 export const createZoneId = (): ZoneId => ({ value: uuidv4() })
 
+// Generic unique ID generator
+export const createUniqueId = (): string => uuidv4()
+
 // Array utilities for immutable operations
 export const removeFromArray = <T>(array: T[], predicate: (item: T) => boolean): T[] => 
   array.filter(item => !predicate(item))

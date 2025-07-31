@@ -83,21 +83,41 @@ export interface Game {
   readonly turnNumber: number;
   readonly stack: Stack;
   readonly globalProperties: Record<string, any>;
+  readonly eventManager: EventManager;
 }
 
 // Event System Types
 
 export interface GameEvent<T = any> {
+  readonly id: string;
   readonly type: string;
   readonly payload: T;
-  readonly timestamp: number;
+  readonly timestamp: Date;
   readonly triggeredBy: PlayerId | 'system';
 }
 
 export interface EventListener {
+  readonly id: string;
   readonly eventType: string;
+  readonly callback: (event: GameEvent, game: Game) => GameEvent[] | void;
   readonly condition?: (event: GameEvent) => boolean;
-  readonly action: (event: GameEvent, game: Game) => GameAction[];
+  readonly priority: number;
+}
+
+export interface EventManager {
+  readonly listeners: EventListener[];
+  readonly eventQueue: GameEvent[];
+  readonly isProcessing: boolean;
+  readonly maxQueueSize?: number;
+  readonly enableLogging?: boolean;
+}
+
+export interface EventProcessingResult {
+  readonly manager: EventManager;
+  readonly game: Game;
+  readonly processedEvents: GameEvent[];
+  readonly generatedEvents: GameEvent[];
+  readonly errors: string[];
 }
 
 // Action System Types

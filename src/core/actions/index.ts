@@ -1,6 +1,10 @@
-// Action Library Implementation
-// This file exports all the core game actions as defined in the framework
+/**
+ * @fileoverview Action System Implementation
+ * The VERBS that manipulate game state immutably
+ * Following TDD approach - TOTAL ACTION DOMINATION!
+ */
 
+export * from './core';
 export * from './move-card';
 export * from './draw-cards';
 export * from './play-card';

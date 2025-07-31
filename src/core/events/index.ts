@@ -1,6 +1,9 @@
-// Event System Implementation
-// This file exports the event system components as defined in the framework
+/**
+ * @fileoverview Event System Implementation
+ * The LOGIC that connects actions to reactive triggers
+ * Following TDD approach - Event System Excellence!
+ */
 
 export * from './event-manager';
-export * from './event-types';
 export * from './event-listeners';
+export * from './game-integration';
