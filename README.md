@@ -155,4 +155,4 @@ Detailed documentation is available in the `documentation/` folder:
 
 ## 📄 License
 
-ISC License - see LICENSE file for details.
+This project is unlicensed. All rights reserved.

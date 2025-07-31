@@ -85,3 +85,15 @@ card-game-testomatic/
 - **Deployment**: .vercel/, .firebase/, .netlify/
 
 **Environment Variables**: Developers need to create `.env.local` with Firebase, AI API keys, and Stripe configuration for full functionality.
+
+#### 2024-12-20 - License Update
+**Timestamp**: 2024-12-20T00:45:00Z
+
+**Work Performed**: Updated project to be unlicensed
+
+**Changes Made**:
+- ✅ Changed license from "ISC" to "UNLICENSED" in package.json
+- ✅ Updated README.md license section to reflect unlicensed status
+- ✅ Verified no other ISC license references in source code (dependency licenses remain unchanged)
+
+**Status**: Project is now properly marked as unlicensed with all rights reserved.
