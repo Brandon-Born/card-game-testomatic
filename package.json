@@ -1,0 +1,62 @@
+{
+  "name": "card-game-testomatic",
+  "version": "1.0.0",
+  "description": "The project is an application designed to rapidly prototype and iterate on card game designs. It functions by ingesting a game designer's rules, automatically generating a playable engine and digital assets, and providing a platform for testing.",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brandon-Born/card-game-testomatic.git"
+  },
+  "keywords": [
+    "card-game",
+    "game-design",
+    "ai",
+    "nextjs",
+    "react"
+  ],
+  "author": "Brandon Born",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Brandon-Born/card-game-testomatic/issues"
+  },
+  "homepage": "https://github.com/Brandon-Born/card-game-testomatic#readme",
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.3",
+    "@types/node": "^24.1.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "autoprefixer": "^10.4.21",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "eslint": "^9.32.0",
+    "eslint-config-next": "^15.4.5",
+    "firebase": "^12.0.0",
+    "lucide-react": "^0.535.0",
+    "next": "^15.4.5",
+    "postcss": "^8.5.6",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "reactflow": "^11.11.4",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
+    "@types/uuid": "^10.0.0",
+    "jest": "^30.0.5",
+    "tailwindcss": "^3.4.17",
+    "uuid": "^11.1.0"
+  }
+}

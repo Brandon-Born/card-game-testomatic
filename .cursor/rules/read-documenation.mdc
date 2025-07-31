@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+Always check the files inside documenation folder before beginning work to understand the context of the codebase.
+
+When complete your current task you MUST ALWAYS update the documentation/change-log.md with a timestamp and a short description of the work performed
