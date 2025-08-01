@@ -3,28 +3,33 @@
 import React, { useState } from 'react'
 import { RuleDesigner } from '@/components/designer'
 import { CardDesigner } from '@/components/designer/CardDesigner'
+import { ProjectManager } from '@/components/designer/ProjectManager'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Save, FolderOpen, LogOut, User } from 'lucide-react'
+import { LogOut, User } from 'lucide-react'
 
 export default function DesignerPage() {
   const { user, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState('rules')
   
-  const handleSaveProject = () => {
-    // TODO: Implement project saving with user backend
-    console.log('Saving project for user:', user?.email)
-  }
-  
-  const handleLoadProject = () => {
-    // TODO: Implement project loading with user backend
-    console.log('Loading project for user:', user?.email)
-  }
+  // Project state
+  const [currentCards, setCurrentCards] = useState<any[]>([])
+  const [currentRules, setCurrentRules] = useState<any[]>([])
 
   const handleSignOut = async () => {
     await signOut()
+  }
+
+  const handleProjectLoad = (project: { cards: any[], rules: any[] }) => {
+    setCurrentCards(project.cards)
+    setCurrentRules(project.rules)
+  }
+
+  const handleNewProject = () => {
+    setCurrentCards([])
+    setCurrentRules([])
   }
 
   return (
@@ -46,15 +51,13 @@ export default function DesignerPage() {
               </div>
               
               {/* Project actions */}
-              <div className="flex gap-2">
-                <Button onClick={handleLoadProject} variant="outline" size="sm">
-                  <FolderOpen className="w-4 h-4 mr-2" />
-                  Load Project
-                </Button>
-                <Button onClick={handleSaveProject} size="sm">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Project
-                </Button>
+              <div className="flex items-center gap-4">
+                <ProjectManager
+                  currentCards={currentCards}
+                  currentRules={currentRules}
+                  onProjectLoad={handleProjectLoad}
+                  onNewProject={handleNewProject}
+                />
                 <Button onClick={handleSignOut} variant="outline" size="sm">
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
@@ -73,11 +76,17 @@ export default function DesignerPage() {
             </TabsList>
             
             <TabsContent value="rules" className="h-[calc(100vh-120px)] m-0">
-              <RuleDesigner />
+              <RuleDesigner 
+                rules={currentRules}
+                onRulesChange={setCurrentRules}
+              />
             </TabsContent>
             
             <TabsContent value="cards" className="h-[calc(100vh-120px)] m-0">
-              <CardDesigner />
+              <CardDesigner 
+                cards={currentCards}
+                onCardsChange={setCurrentCards}
+              />
             </TabsContent>
           </Tabs>
         </div>

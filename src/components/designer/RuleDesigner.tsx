@@ -60,7 +60,12 @@ const initialNodes = [
 
 const initialEdges: Edge[] = []
 
-export function RuleDesigner() {
+interface RuleDesignerProps {
+  rules?: any[]
+  onRulesChange?: (rules: any[]) => void
+}
+
+export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const [selectedNode, setSelectedNode] = useState<string | null>(null)

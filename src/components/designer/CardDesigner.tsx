@@ -42,8 +42,20 @@ const initialCards: GameCard[] = [
   }
 ]
 
-export function CardDesigner() {
-  const [cards, setCards] = useState<GameCard[]>(initialCards)
+interface CardDesignerProps {
+  cards?: GameCard[]
+  onCardsChange?: (cards: GameCard[]) => void
+}
+
+export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerProps) {
+  const [cards, setCards] = useState<GameCard[]>(propCards || initialCards)
+  
+  // Update local state when props change
+  React.useEffect(() => {
+    if (propCards) {
+      setCards(propCards)
+    }
+  }, [propCards])
   const [selectedCard, setSelectedCard] = useState<GameCard | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState<Partial<GameCard>>({})
