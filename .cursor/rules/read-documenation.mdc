@@ -3,4 +3,5 @@ alwaysApply: true
 ---
 Always check the files inside documenation folder before beginning work to understand the context of the codebase.
 
-When complete your current task you MUST ALWAYS update the documentation/change-log.md with a timestamp and a short description of the work performed
+
+When complete your current task you MUST ALWAYS run unit tests and confirm they pass and then update the documentation/change-log.md with a timestamp and a short description of the work performed.
