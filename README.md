@@ -19,10 +19,17 @@ The project is an application designed to rapidly prototype and iterate on card 
    npm install
    ```
 
-2. **Set up environment variables:**
-   Create a `.env.local` file in the root directory with:
+2. **Set up Firebase project:**
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project or use existing one
+   - Enable Authentication → Sign-in method → Email/Password (enable Email link)
+   - Add your domain to authorized domains (localhost:3000 for development)
+   - Get your Firebase config from Project Settings → General → Your apps
+
+3. **Set up environment variables:**
+   Create a `.env.local` file in the root directory with your Firebase config:
    ```env
-   # Firebase Configuration
+   # Firebase Configuration (Required)
    NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key_here
    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id_here
@@ -30,7 +37,7 @@ The project is an application designed to rapidly prototype and iterate on card 
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id_here
    NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id_here
 
-   # AI Integration (Choose one)
+   # Optional: AI Integration (for Phase 2)
    GEMINI_API_KEY=your_gemini_api_key_here
    # OR
    OPENAI_API_KEY=your_openai_api_key_here
@@ -39,13 +46,18 @@ The project is an application designed to rapidly prototype and iterate on card 
    NODE_ENV=development
    ```
 
-3. **Start the development server:**
+4. **Start the development server:**
    ```bash
    npm run dev
    ```
 
-4. **Visit the application:**
+5. **Visit the application:**
    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+6. **Sign in to use the designer:**
+   - Click "Start Creating" → Enter your email → Check email for magic link
+   - Click the magic link to sign in automatically
+   - Access the protected `/designer` route with your authenticated account
 
 ## 🏗️ Project Structure
 

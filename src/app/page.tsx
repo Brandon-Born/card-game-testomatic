@@ -1,6 +1,12 @@
+'use client'
+
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { LogOut, User } from "lucide-react";
 
 export default function Home() {
+  const { user, signOut } = useAuth();
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-16">
@@ -56,12 +62,41 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="pt-8">
-            <Link href="/designer">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors">
-                Start Creating
-              </button>
-            </Link>
+          <div className="pt-8 space-y-4">
+            {user ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-center gap-2 text-gray-600">
+                  <User className="w-4 h-4" />
+                  Signed in as {user.email}
+                </div>
+                <Link href="/designer">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors">
+                    Continue to Designer
+                  </button>
+                </Link>
+                <div className="flex justify-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => signOut()}
+                    className="gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Link href="/login">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors">
+                    Start Creating
+                  </button>
+                </Link>
+                <p className="text-sm text-gray-500">
+                  Sign in to save and manage your card games
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
