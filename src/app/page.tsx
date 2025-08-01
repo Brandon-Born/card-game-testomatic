@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -55,9 +57,11 @@ export default function Home() {
           </div>
           
           <div className="pt-8">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors">
-              Start Creating
-            </button>
+            <Link href="/designer">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors">
+                Start Creating
+              </button>
+            </Link>
           </div>
         </div>
       </div>

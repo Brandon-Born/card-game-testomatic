@@ -1,15 +1,8 @@
-// UI Components
-// This directory will contain reusable UI components built with shadcn/ui
-
-// Core components will be added as needed:
-// - Button
-// - Card
-// - Dialog
-// - Input
-// - Badge
-// - Separator
-// - Tabs
-// - etc.
-
-// These components will be generated using shadcn/ui CLI
-// Example: npx shadcn-ui@latest add button
+export { Button } from './button'
+export { Input } from './input'
+export { Label } from './label'
+export { Badge } from './badge'
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select'
+export { Textarea } from './textarea'
