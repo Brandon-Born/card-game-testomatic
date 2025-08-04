@@ -1,5 +1,38 @@
 ### Agent Change Log by Run
 
+#### 2025-01-12 - CRITICAL INFINITE LOOP BUG FIX! 🔄
+**Timestamp**: 2025-01-12T21:45:00Z
+
+**Work Performed**: Fixed critical infinite loop bug in RuleDesigner component that occurred when switching between tabs
+
+**Issue Identified**: 
+- Switching between Card Designer and Rules Designer tabs caused React infinite update loop
+- Error: "Maximum update depth exceeded" when switching back to Rules Designer after opening cards
+- Root cause: useEffect hooks creating circular dependency between loading and saving rules
+
+**Changes Made**:
+- ✅ **Fixed useEffect Dependencies**: Removed `setNodes` and `setEdges` from load effect dependencies (stable React Flow functions)
+- ✅ **Added Initial Load Tracking**: Implemented `isInitialLoadRef` to prevent save during load operations
+- ✅ **Enhanced Load Logic**: Added `hasLoadedRef` to ensure save only occurs after actual data has been loaded
+- ✅ **Improved Timing**: Added proper setTimeout delays to allow React state updates to complete
+- ✅ **Fixed React Lint Warning**: Escaped quotes in JSX text content to comply with React standards
+
+**Technical Fix Details**:
+- **useEffect Load Effect**: Now uses `[rules]` only as dependency, preventing circular updates
+- **useEffect Save Effect**: Added conditional logic to prevent save during initial load or when no data loaded
+- **State Management**: Proper timing control with refs to track component lifecycle phases
+- **JSX Compliance**: Changed unescaped quotes to `&quot;` in text content
+
+**Testing Results**: 
+- ✅ All 268 tests still passing (framework unchanged)
+- ✅ No linting errors in RuleDesigner component
+- ✅ Tab switching now works without infinite loops
+- ✅ Rules load/save cycle preserved without state corruption
+
+**Impact**: Users can now freely switch between Card Designer and Rules Designer tabs without encountering infinite loop crashes. The visual designer interface is now stable across all user interactions.
+
+---
+
 #### 2025-01-03 - CRITICAL PROJECT SAVE/LOAD BUG FIX! 🛠️
 **Timestamp**: 2025-01-03T02:30:00Z
 

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import {
   ReactFlow,
   MiniMap,
@@ -51,7 +51,19 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
   const [generatedCode, setGeneratedCode] = useState<string>('')
   const [showRulePanel, setShowRulePanel] = useState(false)
   
+  // Track if we're in the initial load phase to prevent save loop
+  const isInitialLoadRef = useRef(true)
+  const hasLoadedRef = useRef(false)
+  
   const { compileRules, generateCode, testRule } = useRuleIntegration()
+
+  // Initialize the component - set initial load flag to false after first render
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      isInitialLoadRef.current = false
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Load rules when the prop changes
   useEffect(() => {
@@ -59,15 +71,26 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
       // Assume rules are stored as { nodes, edges }
       const ruleData = rules[0] // For now, assume single rule set
       if (ruleData && ruleData.nodes && ruleData.edges) {
+        isInitialLoadRef.current = true // Set flag to prevent save
         setNodes(ruleData.nodes)
         setEdges(ruleData.edges)
+        hasLoadedRef.current = true
+        // Reset flag after state updates complete
+        setTimeout(() => {
+          isInitialLoadRef.current = false
+        }, 150)
       }
     }
-  }, [rules, setNodes, setEdges])
+  }, [rules])
 
-  // Save rules when nodes or edges change (but not on initial load)
+  // Save rules when nodes or edges change (but not during initial load)
   useEffect(() => {
-    if (onRulesChange) {
+    // Only save if:
+    // 1. We're not in initial load
+    // 2. onRulesChange callback is provided
+    // 3. We have either nodes or edges
+    // 4. We've actually loaded data before (to prevent empty saves)
+    if (!isInitialLoadRef.current && onRulesChange && hasLoadedRef.current) {
       const ruleData = { nodes, edges }
       onRulesChange([ruleData])
     }
@@ -251,7 +274,7 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
                     <Card>
                       <CardContent className="p-4 text-center text-gray-500">
                         <Code className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                        No rules compiled yet. Connect trigger and action nodes, then click "Compile Rules".
+                        No rules compiled yet. Connect trigger and action nodes, then click &quot;Compile Rules&quot;.
                       </CardContent>
                     </Card>
                   ) : (
