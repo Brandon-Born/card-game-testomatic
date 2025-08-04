@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/firebase/config'
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { getAuth } from 'firebase-admin/auth'
 import { initializeApp, getApps, cert } from 'firebase-admin/app'
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 
 // Initialize Firebase Admin SDK
 if (getApps().length === 0) {
@@ -10,6 +9,12 @@ if (getApps().length === 0) {
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
       // Production: use service account
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+      
+      // Fix newlines in private_key if they're escaped
+      if (serviceAccount.private_key) {
+        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n')
+      }
+      
       initializeApp({
         credential: cert(serviceAccount),
         projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -24,6 +29,9 @@ if (getApps().length === 0) {
     console.error('Firebase Admin initialization error:', error)
   }
 }
+
+// Get Firestore instance from Admin SDK
+const adminDb = getFirestore()
 
 /**
  * Verify the Firebase ID token from the request
@@ -66,10 +74,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Query Firestore for user's projects
-    const projectsRef = collection(db, 'projects')
-    const q = query(projectsRef, where('ownerUid', '==', uid))
-    const querySnapshot = await getDocs(q)
+    // Query Firestore for user's projects using Admin SDK
+    const projectsRef = adminDb.collection('projects')
+    const querySnapshot = await projectsRef.where('ownerUid', '==', uid).get()
     
     const projects = querySnapshot.docs.map(doc => ({
       id: doc.id,
@@ -107,13 +114,13 @@ export async function POST(request: NextRequest) {
       cards,
       rules,
       ownerUid: uid,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     }
 
-    // Save to Firestore
-    const projectsRef = collection(db, 'projects')
-    const docRef = await addDoc(projectsRef, projectData)
+    // Save to Firestore using Admin SDK
+    const projectsRef = adminDb.collection('projects')
+    const docRef = await projectsRef.add(projectData)
     
     const project = {
       id: docRef.id,

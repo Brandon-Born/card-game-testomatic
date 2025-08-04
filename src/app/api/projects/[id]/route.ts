@@ -1,7 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/firebase/config'
-import { doc, getDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { getAuth } from 'firebase-admin/auth'
+import { initializeApp, getApps, cert } from 'firebase-admin/app'
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+
+// Initialize Firebase Admin SDK (if not already initialized)
+if (getApps().length === 0) {
+  try {
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      // Production: use service account
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+      
+      // Fix newlines in private_key if they're escaped
+      if (serviceAccount.private_key) {
+        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n')
+      }
+      
+      initializeApp({
+        credential: cert(serviceAccount),
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      })
+    } else {
+      // Development: use project ID only (requires Firebase emulator or reduced security)
+      initializeApp({
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      })
+    }
+  } catch (error) {
+    console.error('Firebase Admin initialization error:', error)
+  }
+}
+
+// Get Firestore instance from Admin SDK
+const adminDb = getFirestore()
 
 /**
  * Verify the Firebase ID token from the request
@@ -38,7 +68,7 @@ async function verifyToken(request: NextRequest): Promise<string | null> {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const uid = await verifyToken(request)
@@ -46,13 +76,13 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
 
-    // Get project from Firestore
-    const projectRef = doc(db, 'projects', id)
-    const projectSnap = await getDoc(projectRef)
+    // Get project from Firestore using Admin SDK
+    const projectRef = adminDb.collection('projects').doc(id)
+    const projectSnap = await projectRef.get()
 
-    if (!projectSnap.exists()) {
+    if (!projectSnap.exists) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
@@ -78,7 +108,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const uid = await verifyToken(request)
@@ -86,15 +116,15 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { name, description, cards, rules } = body
 
-    // Update project in Firestore
-    const projectRef = doc(db, 'projects', id)
-    const projectSnap = await getDoc(projectRef)
+    // Update project in Firestore using Admin SDK
+    const projectRef = adminDb.collection('projects').doc(id)
+    const projectSnap = await projectRef.get()
 
-    if (!projectSnap.exists()) {
+    if (!projectSnap.exists) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
@@ -104,7 +134,7 @@ export async function PUT(
     }
 
     const updateData: any = {
-      updatedAt: serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     }
 
     if (name !== undefined) updateData.name = name
@@ -112,7 +142,7 @@ export async function PUT(
     if (cards !== undefined) updateData.cards = cards
     if (rules !== undefined) updateData.rules = rules
 
-    await updateDoc(projectRef, updateData)
+    await projectRef.update(updateData)
 
     const updatedProject = {
       id,
@@ -133,7 +163,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const uid = await verifyToken(request)
@@ -141,13 +171,13 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
 
-    // Delete project from Firestore
-    const projectRef = doc(db, 'projects', id)
-    const projectSnap = await getDoc(projectRef)
+    // Delete project from Firestore using Admin SDK
+    const projectRef = adminDb.collection('projects').doc(id)
+    const projectSnap = await projectRef.get()
 
-    if (!projectSnap.exists()) {
+    if (!projectSnap.exists) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
@@ -156,7 +186,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    await deleteDoc(projectRef)
+    await projectRef.delete()
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting project:', error)
