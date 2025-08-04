@@ -21,26 +21,7 @@ interface GameCard {
   properties: Record<string, any>
 }
 
-const initialCards: GameCard[] = [
-  {
-    id: '1',
-    name: 'Lightning Bolt',
-    text: 'Deal 3 damage to any target.',
-    type: 'Instant',
-    cost: 1,
-    properties: { color: 'red' }
-  },
-  {
-    id: '2',
-    name: 'Grizzly Bears',
-    text: 'A simple creature.',
-    type: 'Creature',
-    cost: 2,
-    power: 2,
-    toughness: 2,
-    properties: { color: 'green', subtype: 'Beast' }
-  }
-]
+const initialCards: GameCard[] = []
 
 interface CardDesignerProps {
   cards?: GameCard[]
@@ -69,7 +50,9 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
       cost: 0,
       properties: {}
     }
-    setCards([...cards, newCard])
+    const updatedCards = [...cards, newCard]
+    setCards(updatedCards)
+    onCardsChange?.(updatedCards)
     setSelectedCard(newCard)
     setEditForm(newCard)
     setIsEditing(true)
@@ -82,7 +65,9 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
   }
 
   const handleDeleteCard = (cardId: string) => {
-    setCards(cards.filter(c => c.id !== cardId))
+    const updatedCards = cards.filter(c => c.id !== cardId)
+    setCards(updatedCards)
+    onCardsChange?.(updatedCards)
     if (selectedCard?.id === cardId) {
       setSelectedCard(null)
     }
@@ -91,9 +76,11 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
   const handleSaveCard = () => {
     if (!editForm.id) return
     
-    setCards(cards.map(card => 
+    const updatedCards = cards.map(card => 
       card.id === editForm.id ? { ...card, ...editForm } as GameCard : card
-    ))
+    )
+    setCards(updatedCards)
+    onCardsChange?.(updatedCards)
     setSelectedCard({ ...selectedCard, ...editForm } as GameCard)
     setIsEditing(false)
   }

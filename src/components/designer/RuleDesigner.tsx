@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import {
   ReactFlow,
   MiniMap,
@@ -33,30 +33,8 @@ const nodeTypes = {
   action: ActionNode,
 }
 
-// Initial nodes for demonstration
-const initialNodes = [
-  {
-    id: '1',
-    type: 'trigger',
-    position: { x: 100, y: 100 },
-    data: { 
-      label: 'Card Played',
-      eventType: 'CARD_PLAYED',
-      description: 'Triggers when any card is played'
-    },
-  },
-  {
-    id: '2',
-    type: 'action',
-    position: { x: 400, y: 100 },
-    data: { 
-      label: 'Draw Cards',
-      actionType: 'drawCards',
-      parameters: { count: 1 },
-      description: 'Draw a specified number of cards'
-    },
-  },
-]
+// Start with an empty canvas
+const initialNodes: any[] = []
 
 const initialEdges: Edge[] = []
 
@@ -74,6 +52,26 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
   const [showRulePanel, setShowRulePanel] = useState(false)
   
   const { compileRules, generateCode, testRule } = useRuleIntegration()
+
+  // Load rules when the prop changes
+  useEffect(() => {
+    if (rules && Array.isArray(rules) && rules.length > 0) {
+      // Assume rules are stored as { nodes, edges }
+      const ruleData = rules[0] // For now, assume single rule set
+      if (ruleData && ruleData.nodes && ruleData.edges) {
+        setNodes(ruleData.nodes)
+        setEdges(ruleData.edges)
+      }
+    }
+  }, [rules, setNodes, setEdges])
+
+  // Save rules when nodes or edges change (but not on initial load)
+  useEffect(() => {
+    if (onRulesChange) {
+      const ruleData = { nodes, edges }
+      onRulesChange([ruleData])
+    }
+  }, [nodes, edges, onRulesChange])
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),

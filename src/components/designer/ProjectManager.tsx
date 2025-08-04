@@ -85,8 +85,7 @@ export function ProjectManager({
   }
 
   const handleLoad = async (projectId: string) => {
-    await loadProject(projectId)
-    const project = projects.find(p => p.id === projectId)
+    const project = await loadProject(projectId)
     if (project) {
       onProjectLoad({
         cards: project.cards || [],

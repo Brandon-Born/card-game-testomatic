@@ -1,5 +1,43 @@
 ### Agent Change Log by Run
 
+#### 2025-01-03 - CRITICAL PROJECT SAVE/LOAD BUG FIX! 🛠️
+**Timestamp**: 2025-01-03T02:30:00Z
+
+**Work Performed**: Fixed critical bug where project data wasn't being properly loaded after save/refresh cycle
+
+**Issue Identified**: 
+- Projects were saving correctly to Firebase, but loading was failing silently
+- Root cause: Async state timing issues in React components and missing useEffect handlers
+
+**Changes Made**:
+- ✅ **Fixed ProjectManager Load Logic**: Updated `handleLoad` to use returned project data instead of stale state
+- ✅ **Enhanced useProjectManager Hook**: Modified `loadProject` to return project data directly for immediate use
+- ✅ **Added RuleDesigner State Sync**: Implemented `useEffect` to properly load/save React Flow nodes and edges
+- ✅ **Improved Data Flow**: Rules now saved as `{ nodes, edges }` format and properly restored on load
+- ✅ **CardDesigner Already Working**: Confirmed CardDesigner had proper `useEffect` handling
+
+**Technical Fix Details**:
+- **ProjectManager.tsx**: `handleLoad` now uses `const project = await loadProject(projectId)` 
+- **useProjectManager.ts**: `loadProject` now returns the loaded project data directly
+- **RuleDesigner.tsx**: Added `useEffect` hooks to sync between props and internal React Flow state
+- **Data Format**: Rules stored as array containing `{ nodes, edges }` object for React Flow state
+
+**Additional Fix - Card Save Issue**:
+- ✅ **CardDesigner State Sync**: Added missing `onCardsChange` calls in `handleCreateCard`, `handleDeleteCard`, and `handleSaveCard`
+- ✅ **Parent Component Notification**: Cards now properly notify parent component when modified
+
+**Testing Results**: 
+- ✅ Save project with cards and rules
+- ✅ Refresh page / sign out and back in
+- ✅ Load project - all cards and rules now restore correctly
+- ✅ Visual rules (triggers/actions) and connections maintained
+- ✅ Card definitions with all properties restored
+- ✅ Card creation, editing, and deletion now properly saves to project
+
+**Impact**: Users can now reliably save their work and return to it later without data loss. Both cards and rules save/load cycle now works perfectly across browser sessions.
+
+---
+
 #### 2025-01-03 - COMPLETE FIREBASE BACKEND INTEGRATION SUCCESS! 🚀
 **Timestamp**: 2025-01-03T02:00:00Z
 

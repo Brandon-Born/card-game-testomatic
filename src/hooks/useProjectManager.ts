@@ -76,7 +76,7 @@ export function useProjectManager() {
   const loadProject = useCallback(async (id: string) => {
     if (!user) {
       setError('User not authenticated')
-      return
+      return null
     }
 
     setLoading(true)
@@ -86,16 +86,20 @@ export function useProjectManager() {
       const response = await getProject(id, user)
       if (response.error) {
         setError(response.error)
-        return
+        return null
       }
 
+      const project = response.data?.project || null
       setState(prev => ({
         ...prev,
-        currentProject: response.data?.project || null,
+        currentProject: project,
         loading: false,
       }))
+      
+      return project
     } catch (error) {
       setError('Failed to load project')
+      return null
     } finally {
       setLoading(false)
     }
