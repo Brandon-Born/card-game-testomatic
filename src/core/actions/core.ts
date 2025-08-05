@@ -3,7 +3,7 @@
  * The foundational framework for all game actions
  */
 
-import { Game, GameAction, PlayerId, CardId, ZoneId } from '@/types'
+import { Game, GameAction, PlayerId, GameEvent } from '@/types'
 
 // Action Context
 export interface ActionContext {
@@ -21,13 +21,7 @@ export interface ActionResult {
   events?: GameEvent[]
 }
 
-// Game Event (for future event system integration)
-export interface GameEvent {
-  type: string
-  payload: any
-  timestamp: Date
-  triggeredBy?: PlayerId | 'system'
-}
+// GameEvent is now imported from @/types
 
 // Core action functions
 

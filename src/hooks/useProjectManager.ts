@@ -63,7 +63,7 @@ export function useProjectManager() {
         projects: response.data?.projects || [],
         loading: false,
       }))
-    } catch (error) {
+    } catch (_error) {
       setError('Failed to load projects')
     } finally {
       setLoading(false)
@@ -97,7 +97,7 @@ export function useProjectManager() {
       }))
       
       return project
-    } catch (error) {
+    } catch (_error) {
       setError('Failed to load project')
       return null
     } finally {
@@ -113,6 +113,8 @@ export function useProjectManager() {
     description: string
     cards: any[]
     rules: any[]
+    zones?: any[]
+    gameConfig?: any
   }) => {
     if (!user) {
       setError('User not authenticated')
@@ -151,7 +153,7 @@ export function useProjectManager() {
       }
 
       return savedProject
-    } catch (error) {
+    } catch (_error) {
       setError('Failed to save project')
       return null
     } finally {
@@ -207,7 +209,7 @@ export function useProjectManager() {
       }))
 
       return true
-    } catch (error) {
+    } catch (_error) {
       setError('Failed to delete project')
       return false
     } finally {

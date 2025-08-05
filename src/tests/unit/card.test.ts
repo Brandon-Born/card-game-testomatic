@@ -3,7 +3,7 @@
  * Following TDD approach - tests written first, implementation follows
  */
 
-import { Card, Counter, CardId, PlayerId, ZoneId } from '@/types'
+import { Card, CardId, PlayerId, ZoneId } from '@/types'
 import { 
   createCard, 
   updateCard, 
@@ -207,7 +207,7 @@ describe('Card Object - TDD Implementation', () => {
     })
 
     it('should not remove more counters than exist', () => {
-      let cardWithCounters = addCounter(card, { type: '+1/+1', count: 2 })
+      const cardWithCounters = addCounter(card, { type: '+1/+1', count: 2 })
       
       expect(() => removeCounter(cardWithCounters, { type: '+1/+1', count: 3 }))
         .toThrow('Cannot remove more counters than exist')

@@ -3,7 +3,7 @@
  * Following TDD approach - tests written first, implementation follows
  */
 
-import { Zone, Card, CardId, PlayerId, ZoneId, Deck, Hand, DiscardPile, PlayArea, Stack } from '@/types'
+import { Zone, CardId, PlayerId, ZoneId, Deck } from '@/types'
 import { 
   createZone,
   createDeck,
@@ -23,7 +23,6 @@ import {
   getBottomCard,
   validateZone
 } from '@/core/primitives/zone'
-import { createCard } from '@/core/primitives/card'
 import { createCardId, createPlayerId, createZoneId } from '@/lib/utils'
 
 describe('Zone Object - TDD Implementation', () => {
@@ -32,9 +31,6 @@ describe('Zone Object - TDD Implementation', () => {
   let mockCardId3: CardId
   let mockPlayerId: PlayerId
   let mockZoneId: ZoneId
-  let testCard1: Card
-  let testCard2: Card
-  let testCard3: Card
 
   beforeEach(() => {
     mockCardId1 = createCardId()
@@ -42,33 +38,6 @@ describe('Zone Object - TDD Implementation', () => {
     mockCardId3 = createCardId()
     mockPlayerId = createPlayerId()
     mockZoneId = createZoneId()
-
-    testCard1 = createCard({
-      id: mockCardId1,
-      name: 'Test Card 1',
-      text: 'First test card',
-      type: 'Creature',
-      owner: mockPlayerId,
-      currentZone: mockZoneId
-    })
-
-    testCard2 = createCard({
-      id: mockCardId2,
-      name: 'Test Card 2',
-      text: 'Second test card',
-      type: 'Instant',
-      owner: mockPlayerId,
-      currentZone: mockZoneId
-    })
-
-    testCard3 = createCard({
-      id: mockCardId3,
-      name: 'Test Card 3',
-      text: 'Third test card',
-      type: 'Sorcery',
-      owner: mockPlayerId,
-      currentZone: mockZoneId
-    })
   })
 
   describe('Base Zone Creation', () => {

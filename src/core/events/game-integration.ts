@@ -3,7 +3,7 @@
  * Functions to integrate events with game state
  */
 
-import { Game, EventListener, EventManager } from '@/types'
+import { Game, EventListener } from '@/types'
 import { updateGame } from '@/core/primitives/game'
 import { subscribeToEvent, unsubscribeFromEvent } from './event-listeners'
 import { createEventManager } from './event-manager'

@@ -5,7 +5,7 @@
 
 import { Game, PlayCardAction, GameAction } from '@/types'
 import { updateGame, getGamePlayer, getGameCard, addZoneToGame } from '@/core/primitives/game'
-import { updatePlayer, getPlayerResource, modifyPlayerResource } from '@/core/primitives/player'
+import { getPlayerResource, modifyPlayerResource } from '@/core/primitives/player'
 import { updateCard, getCardProperty } from '@/core/primitives/card'
 import { createPlayArea, addCardToZone, removeCardFromZone } from '@/core/primitives/zone'
 import { createZoneId } from '@/lib/utils'
@@ -24,7 +24,8 @@ export function playCard(params: PlayCardParams): PlayCardAction {
 }
 
 export function handlePlayCard(game: Game, action: GameAction): Game {
-  const { cardId, playerId, targets } = action.payload
+  const { cardId, playerId } = action.payload
+  // targets parameter reserved for future targeting functionality
 
   // Get player and card
   const player = getGamePlayer(game, playerId)
@@ -107,7 +108,8 @@ export function handlePlayCard(game: Game, action: GameAction): Game {
 }
 
 export function validatePlayCard(game: Game, action: GameAction): boolean {
-  const { cardId, playerId, targets } = action.payload
+  const { cardId, playerId } = action.payload
+  // targets parameter reserved for future targeting functionality
 
   const player = getGamePlayer(game, playerId)
   const card = getGameCard(game, cardId)

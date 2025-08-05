@@ -38,7 +38,7 @@ export function validatePlayerCreation(params: CreatePlayerParams): void {
   }
   
   if (params.resources) {
-    Object.entries(params.resources).forEach(([key, value]) => {
+    Object.entries(params.resources).forEach(([_key, value]) => {
       if (typeof value !== 'number') {
         throw new Error('Resource values must be numbers')
       }
@@ -244,7 +244,7 @@ export function validatePlayer(player: any): asserts player is Player {
     throw new Error('Resources must be an object')
   }
 
-  Object.entries(player.resources).forEach(([key, value]) => {
+  Object.entries(player.resources).forEach(([_key, value]) => {
     if (typeof value !== 'number') {
       throw new Error('Resource values must be numbers')
     }

@@ -3,7 +3,7 @@
  * Core event publishing and processing system
  */
 
-import { EventManager, GameEvent, EventListener, EventProcessingResult, Game } from '@/types'
+import { EventManager, GameEvent, EventProcessingResult, Game } from '@/types'
 import { createUniqueId } from '@/lib/utils'
 
 export interface CreateEventManagerParams {

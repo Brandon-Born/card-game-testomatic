@@ -18,17 +18,22 @@ import {
   AlertCircle,
   X 
 } from 'lucide-react'
+import type { ZoneTemplate } from '@/types'
 
 interface ProjectManagerProps {
   currentCards: any[]
   currentRules: any[]
-  onProjectLoad: (project: { cards: any[], rules: any[] }) => void
+  currentZones: ZoneTemplate[]
+  currentGameConfig?: any
+  onProjectLoad: (project: { cards: any[], rules: any[], zones?: ZoneTemplate[], gameConfig?: any }) => void
   onNewProject: () => void
 }
 
 export function ProjectManager({ 
   currentCards, 
   currentRules, 
+  currentZones,
+  currentGameConfig,
   onProjectLoad, 
   onNewProject 
 }: ProjectManagerProps) {
@@ -77,6 +82,8 @@ export function ProjectManager({
       description: projectDescription.trim(),
       cards: currentCards,
       rules: currentRules,
+      zones: currentZones,
+      gameConfig: currentGameConfig,
     })
 
     if (saved) {
@@ -90,6 +97,8 @@ export function ProjectManager({
       onProjectLoad({
         cards: project.cards || [],
         rules: project.rules || [],
+        zones: project.zones || [],
+        gameConfig: project.gameConfig || null,
       })
       setShowLoadDialog(false)
     }
@@ -207,6 +216,7 @@ export function ProjectManager({
               <div className="text-sm text-gray-600">
                 <p>• Cards: {currentCards.length}</p>
                 <p>• Rules: {currentRules.length}</p>
+                <p>• Zones: {currentZones.length}</p>
               </div>
 
               <div className="flex gap-2 justify-end">

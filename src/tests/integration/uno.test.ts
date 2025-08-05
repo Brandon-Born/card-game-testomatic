@@ -15,26 +15,19 @@
  * - Complete event-driven rule enforcement and validation
  */
 
-import { Game, Player, Card, Zone, GameEvent, EventListener } from '@/types';
+import { Game, Player, Card, Zone, EventListener } from '@/types';
 import { 
-  createGame, 
-  addPlayerToGame, 
-  addCardToGame, 
-  addZoneToGame,
+  createGame,
   setGamePhase,
   setCurrentPlayer,
   nextPlayer,
-  getGamePlayer,
-  getGameZone,
-  getGameCard
+  getGamePlayer
 } from '@/core/primitives/game';
-import { createPlayer, modifyPlayerResource } from '@/core/primitives/player';
+import { createPlayer } from '@/core/primitives/player';
 import { createCard } from '@/core/primitives/card';
-import { createDeck, createHand, addCardToZone, createPlayArea, createDiscardPile } from '@/core/primitives/zone';
+import { createDeck, createHand, addCardToZone, createDiscardPile } from '@/core/primitives/zone';
 import { 
-  moveCard, 
-  drawCards,
-  playCard,
+  moveCard,
   modifyStat,
   executeAction,
   canExecuteAction
@@ -43,8 +36,7 @@ import {
   createEventListener, 
   createGameEvent, 
   addEventListenerToGame,
-  publishEvent,
-  processEvents
+  publishEvent
 } from '@/core/events';
 import { createGameId, createPlayerId, createCardId, createZoneId } from '@/lib/utils';
 
@@ -168,7 +160,7 @@ describe('UNO Integration Test', () => {
           const card = event.payload.card as Card;
           return card.properties.value === 'Reverse';
         },
-        callback: (event, game) => {
+        callback: (event) => {
           return [createGameEvent({
             type: 'DIRECTION_REVERSED',
             payload: { 
@@ -231,7 +223,7 @@ describe('UNO Integration Test', () => {
           const card = event.payload.card as Card;
           return card.properties.isWild;
         },
-        callback: (event, game) => {
+        callback: (event) => {
           return [createGameEvent({
             type: 'COLOR_CHANGED',
             payload: { 
@@ -256,7 +248,7 @@ describe('UNO Integration Test', () => {
           );
           return playerHand?.cards.length === 1;
         },
-        callback: (event, game) => {
+        callback: (event) => {
           return [createGameEvent({
             type: 'UNO_VALID',
             payload: { 
@@ -279,7 +271,7 @@ describe('UNO Integration Test', () => {
           );
           return playerHand?.cards.length === 0;
         },
-        callback: (event, game) => {
+        callback: (event) => {
           return [createGameEvent({
             type: 'GAME_WON',
             payload: { 
@@ -500,8 +492,8 @@ describe('UNO Integration Test', () => {
       const deckId = createZoneId();
       discardPileId = createZoneId();
       
-      const deck = createDeck({ id: deckId, owner: null });
-      const discardPile = createDiscardPile({ id: discardPileId, owner: null });
+      const deck = createDeck({ id: deckId, owner: createPlayerId() }); // Shared deck
+      const discardPile = createDiscardPile({ id: discardPileId, owner: createPlayerId() }); // Shared discard pile
       const playerHands = players.map(p => createHand({ id: createZoneId(), owner: p.id }));
       
       // Create specific test cards
@@ -523,7 +515,7 @@ describe('UNO Integration Test', () => {
       testCards[1] = { ...testCards[1], owner: players[1].id, currentZone: playerHands[1].id };
       testCards[2] = { ...testCards[2], owner: players[2].id, currentZone: playerHands[2].id };
       testCards[3] = { ...testCards[3], owner: players[3].id, currentZone: playerHands[3].id };
-      testCards[4] = { ...testCards[4], owner: null, currentZone: deckId }; // Wild Draw Four in deck
+      testCards[4] = { ...testCards[4], owner: createPlayerId(), currentZone: deckId }; // Wild Draw Four in deck
 
       game = createGame({
         id: createGameId(),
@@ -592,7 +584,7 @@ describe('UNO Integration Test', () => {
         };
       }
       
-      expect(currentGame.currentPlayer.value).toBe(players[2].id.value); // Charlie
+      expect(currentGame.currentPlayer?.value).toBe(players[2].id.value); // Charlie
     });
 
     it('should handle Reverse card effects and direction changes', () => {

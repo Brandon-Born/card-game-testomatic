@@ -5,8 +5,8 @@
 
 import { Game, GameAction } from '@/types'
 import { updateGame, getGamePlayer, getGameCard } from '@/core/primitives/game'
-import { updatePlayer, addPlayerCounter, removePlayerCounter } from '@/core/primitives/player'
-import { updateCard, addCounter as addCardCounter, removeCounter as removeCardCounter } from '@/core/primitives/card'
+import { addPlayerCounter, removePlayerCounter } from '@/core/primitives/player'
+import { addCounter as addCardCounter, removeCounter as removeCardCounter } from '@/core/primitives/card'
 
 export interface CounterActionParams {
   target: any // CardId or PlayerId

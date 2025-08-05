@@ -3,7 +3,7 @@
  * Following TDD approach - tests written first, implementation follows
  */
 
-import { Player, Counter, PlayerId, ZoneId } from '@/types'
+import { Player, PlayerId, ZoneId } from '@/types'
 import { 
   createPlayer,
   updatePlayer,
@@ -271,7 +271,7 @@ describe('Player Object - TDD Implementation', () => {
     })
 
     it('should not remove more counters than exist', () => {
-      let playerWithCounters = addPlayerCounter(player, { type: 'poison', count: 2 })
+      const playerWithCounters = addPlayerCounter(player, { type: 'poison', count: 2 })
       
       expect(() => removePlayerCounter(playerWithCounters, { type: 'poison', count: 3 }))
         .toThrow('Cannot remove more counters than exist')

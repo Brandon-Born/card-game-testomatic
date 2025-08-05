@@ -4,7 +4,7 @@
  * The Game object is the master container that orchestrates all game state
  */
 
-import { Game, Player, Card, Zone, GameId, PlayerId, CardId, ZoneId, Deck, Hand, Stack } from '@/types'
+import { Game, Player, Card, GameId, PlayerId, CardId, ZoneId, Deck, Hand } from '@/types'
 import { 
   createGame,
   updateGame,
@@ -32,7 +32,7 @@ import {
 } from '@/core/primitives/game'
 import { createPlayer } from '@/core/primitives/player'
 import { createCard } from '@/core/primitives/card'
-import { createDeck, createHand, createStack } from '@/core/primitives/zone'
+import { createDeck, createHand } from '@/core/primitives/zone'
 import { createGameId, createPlayerId, createCardId, createZoneId } from '@/lib/utils'
 
 describe('Game Object - TDD Implementation', () => {
@@ -392,7 +392,6 @@ describe('Game Object - TDD Implementation', () => {
     })
 
     it('should advance through predefined phases', () => {
-      const phases = ['upkeep', 'main', 'combat', 'end']
       let currentGame = setGamePhase(game, 'upkeep')
 
       // Advance through each phase

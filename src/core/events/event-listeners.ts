@@ -7,6 +7,7 @@ import { EventManager, EventListener, GameEvent, Game } from '@/types'
 import { createUniqueId } from '@/lib/utils'
 
 export interface CreateEventListenerParams {
+  id?: string
   eventType: string
   callback: (event: GameEvent, game: Game) => GameEvent[] | void
   condition?: (event: GameEvent) => boolean
@@ -23,7 +24,7 @@ export function createEventListener(params: CreateEventListenerParams): EventLis
   }
 
   return {
-    id: createUniqueId(),
+    id: params.id || createUniqueId(),
     eventType: params.eventType,
     callback: params.callback,
     condition: params.condition,

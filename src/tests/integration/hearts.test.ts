@@ -15,26 +15,18 @@
  * - Complete trick-taking with turn rotation and phase management
  */
 
-import { Game, Player, Card, Zone, GameEvent, EventListener } from '@/types';
+import { Game, Player, Card, Zone, EventListener } from '@/types';
 import { 
-  createGame, 
-  addPlayerToGame, 
-  addCardToGame, 
-  addZoneToGame,
+  createGame,
   setGamePhase,
-  setCurrentPlayer,
   nextPlayer,
   getGamePlayer,
-  getGameZone,
-  getGameCard
 } from '@/core/primitives/game';
-import { createPlayer, modifyPlayerResource } from '@/core/primitives/player';
+import { createPlayer } from '@/core/primitives/player';
 import { createCard } from '@/core/primitives/card';
 import { createDeck, createHand, addCardToZone, createPlayArea } from '@/core/primitives/zone';
 import { 
-  moveCard, 
-  drawCards,
-  playCard,
+  moveCard,
   modifyStat,
   executeAction,
   canExecuteAction
@@ -43,8 +35,7 @@ import {
   createEventListener, 
   createGameEvent, 
   addEventListenerToGame,
-  publishEvent,
-  processEvents
+  publishEvent
 } from '@/core/events';
 import { createGameId, createPlayerId, createCardId, createZoneId } from '@/lib/utils';
 
@@ -338,7 +329,7 @@ describe('Hearts Integration Test', () => {
     it('should deal 13 cards to each player using framework actions', () => {
       // Create a setup that works with drawCards action - use moveCard for dealing instead
       let currentGame = setGamePhase(game, 'dealing');
-      const deck = currentGame.zones.find(z => z.name === 'Deck')!;
+      currentGame.zones.find(z => z.name === 'Deck')!;
       
       // Deal cards clockwise using moveCard (which is what Hearts actually does)
       for (let cardNum = 0; cardNum < 13; cardNum++) {
@@ -381,7 +372,7 @@ describe('Hearts Integration Test', () => {
       let currentGame = game;
       
       // Create a heart card for testing
-      const heartCard = createHeartsCard('hearts', '7');
+      createHeartsCard('hearts', '7');
       
       // Test that hearts are not broken initially
       expect(currentGame.globalProperties.heartsBroken).toBe(false);
@@ -529,7 +520,7 @@ describe('Hearts Integration Test', () => {
 
       // Advance to next player
       currentGame = nextPlayer(currentGame);
-      expect(currentGame.currentPlayer.value).toBe(players[1].id.value);
+      expect(currentGame.currentPlayer?.value).toBe(players[1].id.value);
 
       // East plays Ace of Spades
       const eastCard = currentGame.cards.find(c => c.properties.rank === 'A' && c.properties.suit === 'spades')!;
@@ -751,7 +742,6 @@ describe('Hearts Integration Test', () => {
 
       // Check for shoot the moon condition
       const allPlayers = currentGame.players;
-      const totalPointsThisRound = 26; // All hearts + Q♠
       const shooter = allPlayers.find(p => {
         // In a real game, we'd track points taken this round
         return p.name === 'South'; // For this test
@@ -822,7 +812,7 @@ describe('Hearts Integration Test', () => {
     });
 
     it('should validate framework action prerequisites', () => {
-      let currentGame = game;
+      const currentGame = game;
       
       // Test invalid modifyStat (non-existent player)
       const fakePlayerId = createPlayerId();

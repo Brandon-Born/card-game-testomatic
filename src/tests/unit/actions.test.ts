@@ -4,7 +4,7 @@
  * Actions are the VERBS that manipulate game state immutably
  */
 
-import { Game, Player, Card, Zone, GameId, PlayerId, CardId, ZoneId, Deck, Hand, GameAction } from '@/types'
+import { Game, Player, Card, GameId, PlayerId, CardId, ZoneId, Deck, Hand } from '@/types'
 import { 
   moveCard,
   drawCards,
@@ -14,7 +14,6 @@ import {
   untapCard as untapCardAction,
   discardCard,
   shuffleZone as shuffleZoneAction,
-  viewZone,
   addCounter as addCounterAction,
   removeCounter as removeCounterAction,
   setTurnPhase,
@@ -23,7 +22,7 @@ import {
   validateAction,
   canExecuteAction
 } from '@/core/actions'
-import { createGame, addPlayerToGame, addCardToGame, addZoneToGame } from '@/core/primitives/game'
+import { createGame } from '@/core/primitives/game'
 import { createPlayer } from '@/core/primitives/player'
 import { createCard } from '@/core/primitives/card'
 import { createDeck, createHand, addCardToZone } from '@/core/primitives/zone'

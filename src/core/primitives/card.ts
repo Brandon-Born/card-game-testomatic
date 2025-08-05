@@ -153,7 +153,7 @@ export function getCardProperty(card: Card, key: string): any {
 }
 
 export function removeCardProperty(card: Card, key: string): Card {
-  const { [key]: removed, ...remainingProperties } = card.properties
+  const { [key]: _removed, ...remainingProperties } = card.properties
   return updateCard(card, { properties: remainingProperties })
 }
 

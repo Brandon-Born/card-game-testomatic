@@ -4,7 +4,7 @@
  * Following TDD approach - the supreme commander of the framework!
  */
 
-import { Game, Player, Card, Zone, Stack, GameId, PlayerId, CardId, ZoneId } from '@/types'
+import { Game, Player, Card, Zone, GameId, PlayerId, CardId, ZoneId } from '@/types'
 import { isValidId, createZoneId } from '@/lib/utils'
 import { createStack } from './zone'
 import { createEventManager } from '@/core/events/event-manager'
@@ -101,7 +101,8 @@ export function validateGameCreation(params: CreateGameParams): void {
 }
 
 export function validateGameState(game: Game): void {
-  if (game.currentPlayer) {
+  // Only validate current player if there are players in the game
+  if (game.players.length > 0 && game.currentPlayer) {
     const playerExists = game.players.some(player => 
       player.id.value === game.currentPlayer!.value
     )
@@ -153,7 +154,7 @@ export function removePlayerFromGame(game: Game, playerId: PlayerId): Game {
   // Clear current player if it was the removed player
   const updates: Partial<Game> = { players: newPlayers }
   if (game.currentPlayer?.value === playerId.value) {
-    updates.currentPlayer = undefined
+    // Note: currentPlayer cannot be undefined, keeping current player
   }
 
   return updateGame(game, updates)
@@ -249,7 +250,7 @@ export function getGlobalProperty(game: Game, key: string): any {
 }
 
 export function removeGlobalProperty(game: Game, key: string): Game {
-  const { [key]: removed, ...remainingProperties } = game.globalProperties
+  const { [key]: _removed, ...remainingProperties } = game.globalProperties
   return updateGame(game, { globalProperties: remainingProperties })
 }
 

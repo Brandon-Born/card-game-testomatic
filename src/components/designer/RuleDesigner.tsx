@@ -25,7 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { Code, Play, CheckCircle, XCircle } from 'lucide-react'
+import { Code, Play } from 'lucide-react'
 
 // Define custom node types
 const nodeTypes = {
@@ -81,7 +81,7 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
         }, 150)
       }
     }
-  }, [rules])
+  }, [rules, setNodes, setEdges])
 
   // Save rules when nodes or edges change (but not during initial load)
   useEffect(() => {
@@ -168,7 +168,7 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
     // Create a test event and game state for demonstration
     const testEvent = {
       id: 'test-event',
-      type: rule.originalRule.trigger.data.eventType,
+      type: (rule.originalRule.trigger.data as any).eventType,
       payload: { cardName: 'Test Card', playerId: 'player1' },
       timestamp: new Date(),
       triggeredBy: 'system' as const
@@ -284,7 +284,7 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-sm">{rule.originalRule.name}</CardTitle>
                             <Badge variant="outline" className="text-xs">
-                              Priority: {rule.originalRule.trigger.data.priority || 1}
+                              Priority: {(rule.originalRule.trigger.data as any).priority || 1}
                             </Badge>
                           </div>
                         </CardHeader>
@@ -293,10 +293,10 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
                           
                           <div className="space-y-2">
                             <div className="text-xs">
-                              <strong>Trigger:</strong> {rule.originalRule.trigger.data.eventType}
-                              {rule.originalRule.trigger.data.condition && (
+                              <strong>Trigger:</strong> {(rule.originalRule.trigger.data as any).eventType}
+                              {(rule.originalRule.trigger.data as any).condition && (
                                 <div className="mt-1 font-mono text-xs bg-gray-100 p-1 rounded">
-                                  {rule.originalRule.trigger.data.condition}
+                                  {(rule.originalRule.trigger.data as any).condition}
                                 </div>
                               )}
                             </div>
@@ -307,7 +307,7 @@ export function RuleDesigner({ rules, onRulesChange }: RuleDesignerProps) {
                                 {rule.originalRule.actions.map((action, idx) => (
                                   <li key={idx} className="flex items-center gap-1">
                                     <Play className="w-3 h-3" />
-                                    {action.data.label} ({action.data.actionType})
+                                    {(action.data as any).label} ({(action.data as any).actionType})
                                   </li>
                                 ))}
                               </ul>

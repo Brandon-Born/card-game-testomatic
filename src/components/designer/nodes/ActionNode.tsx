@@ -13,7 +13,7 @@ interface ActionNodeData {
   parameters: Record<string, any>
 }
 
-export function ActionNode({ data, selected }: NodeProps<ActionNodeData>) {
+export function ActionNode({ data, selected }: NodeProps & { data: ActionNodeData }) {
   return (
     <Card className={`min-w-[200px] transition-all ${
       selected ? 'ring-2 ring-blue-500 shadow-lg' : 'shadow-md'

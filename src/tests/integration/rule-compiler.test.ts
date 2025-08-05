@@ -1,5 +1,6 @@
 import { RuleCompiler } from '@/components/designer/RuleCompiler'
 import { createGameEvent } from '@/core/events'
+import { GameEvent } from '@/types'
 import type { Node, Edge } from '@xyflow/react'
 
 describe('Rule Compiler Integration', () => {
@@ -95,8 +96,8 @@ describe('Rule Compiler Integration', () => {
     const resultEvents = rule.eventListener.callback(triggerEvent, mockGame)
 
     expect(resultEvents).toHaveLength(1)
-    expect(resultEvents[0].type).toBe('MODIFY_STAT_REQUESTED')
-    expect(resultEvents[0].payload).toEqual({
+    expect((resultEvents as GameEvent[])[0].type).toBe('MODIFY_STAT_REQUESTED')
+    expect((resultEvents as GameEvent[])[0].payload).toEqual({
       target: 'opponent',
       stat: 'life',
       value: -3
@@ -167,6 +168,6 @@ describe('Rule Compiler Integration', () => {
 
     const resultEvents = rule.eventListener.callback(triggerEvent, mockGame)
 
-    expect(resultEvents[0].payload.target).toBe('player2')
+    expect((resultEvents as GameEvent[])[0].payload.target).toBe('player2')
   })
 })

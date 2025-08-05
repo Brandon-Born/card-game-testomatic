@@ -4,18 +4,18 @@
  * Demonstrates real game scenarios and complex interactions
  */
 
-import { Game, Player, Card, Zone, GameEvent, EventListener } from '@/types'
+import { Game, Card, Zone, GameEvent } from '@/types'
 import { 
   createGame, 
-  addPlayerToGame, 
-  addCardToGame, 
-  addZoneToGame
+  // addPlayerToGame, 
+  // addCardToGame, 
+  // addZoneToGame - Reserved for future game modification features
 } from '@/core/primitives/game'
 import { createPlayer } from '@/core/primitives/player'
 import { createCard } from '@/core/primitives/card'
 import { createDeck, createHand, addCardToZone } from '@/core/primitives/zone'
 import { 
-  moveCard, 
+  // moveCard, - Reserved for future manual card movement features 
   drawCards, 
   playCard, 
   modifyStat, 
@@ -87,7 +87,7 @@ describe('Framework Integration Tests', () => {
       const deckWithPotion = addCardToZone(player2Deck, healingPotion.id)
 
       // Create game and add all components
-      let game = createGame({
+      const game = createGame({
         id: createGameId(),
         players: [player1, player2],
         zones: [deckWithBolt, player1Hand, deckWithPotion, player2Hand],
@@ -175,7 +175,7 @@ describe('Framework Integration Tests', () => {
         condition: (event: GameEvent) => {
           return event.payload.cardName === 'Lightning Bolt'
         },
-        callback: (event: GameEvent, gameState: Game) => {
+        callback: (event: GameEvent, _gameState: Game) => {
           // When Lightning Bolt is played, deal damage to target
           return [
             createGameEvent({
@@ -195,7 +195,7 @@ describe('Framework Integration Tests', () => {
       // Add listener for damage events to modify player life
       const lifeModifierListener = createEventListener({
         eventType: 'DAMAGE_DEALT',
-        callback: (event: GameEvent, gameState: Game) => {
+        callback: (_event: GameEvent, _gameState: Game) => {
           // This would normally be handled by the action system
           // but we're demonstrating the event flow
           return []
@@ -250,8 +250,8 @@ describe('Framework Integration Tests', () => {
     let game: Game
     let player1Id: any
     let player2Id: any
-    let cards: { [key: string]: any } = {}
-    let zones: { [key: string]: any } = {}
+    const cards: { [key: string]: any } = {}
+    const zones: { [key: string]: any } = {}
 
     beforeEach(() => {
       // Create comprehensive game setup
@@ -371,7 +371,7 @@ describe('Framework Integration Tests', () => {
       const creatureEntersListener = createEventListener({
         eventType: 'CARD_PLAYED',
         condition: (event: GameEvent) => event.payload.cardType === 'Creature',
-        callback: (event: GameEvent, gameState: Game) => [
+        callback: (event: GameEvent, _gameState: Game) => [
           createGameEvent({
             type: 'CREATURE_ENTERS_BATTLEFIELD',
             payload: {
@@ -386,7 +386,7 @@ describe('Framework Integration Tests', () => {
       // Setup triggered ability for when creatures enter
       const triggeredAbilityListener = createEventListener({
         eventType: 'CREATURE_ENTERS_BATTLEFIELD',
-        callback: (event: GameEvent, gameState: Game) => [
+        callback: (_event: GameEvent, _gameState: Game) => [
           createGameEvent({
             type: 'DAMAGE_DEALT',
             payload: {
@@ -463,8 +463,8 @@ describe('Framework Integration Tests', () => {
       ]
 
       // Create zones for all players
-      const zones = []
-      const cards = []
+      const zones: Zone[] = []
+      const cards: Card[] = []
 
       players.forEach((player, index) => {
         let deck = createDeck({ id: createZoneId(), owner: player.id })
@@ -489,7 +489,7 @@ describe('Framework Integration Tests', () => {
         zones.push(deck, hand)
       })
 
-      let game = createGame({
+      const game = createGame({
         id: createGameId(),
         players,
         zones,
@@ -508,7 +508,7 @@ describe('Framework Integration Tests', () => {
       ]
 
       let currentGame = game
-      operations.forEach((operation, index) => {
+      operations.forEach((operation, _index) => {
         const previousGame = currentGame
         currentGame = operation(currentGame)
 
@@ -559,7 +559,7 @@ describe('Framework Integration Tests', () => {
         resources: { life: 20, mana: 2 }
       })
 
-      let game = createGame({
+      const game = createGame({
         id: createGameId(),
         players: [player1],
         zones: [],
@@ -656,8 +656,8 @@ describe('Framework Integration Tests', () => {
         })
       )
 
-      const zones = []
-      const cards = []
+      const zones: Zone[] = []
+      const cards: Card[] = []
 
       players.forEach((player, playerIndex) => {
         let deck = createDeck({ id: createZoneId(), owner: player.id })

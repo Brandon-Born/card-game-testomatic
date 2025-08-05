@@ -4,7 +4,7 @@
  * Events are the LOGIC that connects actions to reactive triggers
  */
 
-import { Game, Player, Card, GameAction, GameEvent, EventListener, EventManager } from '@/types'
+import { Game, Player, Card, GameEvent, EventManager } from '@/types'
 import { 
   createEventManager,
   publishEvent,
@@ -19,11 +19,10 @@ import {
   createGameEvent,
   validateEventListener
 } from '@/core/events'
-import { createGame, addPlayerToGame, addCardToGame } from '@/core/primitives/game'
+import { createGame } from '@/core/primitives/game'
 import { createPlayer } from '@/core/primitives/player'
 import { createCard } from '@/core/primitives/card'
 import { createDeck, createHand } from '@/core/primitives/zone'
-import { moveCard, drawCards, playCard, modifyStat } from '@/core/actions'
 import { createGameId, createPlayerId, createCardId, createZoneId } from '@/lib/utils'
 
 describe('Event System - TDD Implementation', () => {
@@ -225,7 +224,7 @@ describe('Event System - TDD Implementation', () => {
         callback: jest.fn()
       })
 
-      let manager = subscribeToEvent(eventManager, listener)
+      const manager = subscribeToEvent(eventManager, listener)
       
       expect(() => subscribeToEvent(manager, listener))
         .toThrow('Listener with this ID already exists')
@@ -352,19 +351,19 @@ describe('Event System - TDD Implementation', () => {
 
       const listener1 = createEventListener({
         eventType: 'CARD_PLAYED',
-        callback: () => callOrder.push(1),
+        callback: () => { callOrder.push(1); return []; },
         priority: 3
       })
 
       const listener2 = createEventListener({
         eventType: 'CARD_PLAYED',
-        callback: () => callOrder.push(2),
+        callback: () => { callOrder.push(2); return []; },
         priority: 1
       })
 
       const listener3 = createEventListener({
         eventType: 'CARD_PLAYED',
-        callback: () => callOrder.push(3),
+        callback: () => { callOrder.push(3); return []; },
         priority: 2
       })
 
@@ -529,7 +528,7 @@ describe('Event System - TDD Implementation', () => {
 
   describe('Complex Event Scenarios', () => {
     it('should handle cascading events', () => {
-      const cascadeCallback = jest.fn((event: GameEvent, game: Game) => {
+      const cascadeCallback = jest.fn((event: GameEvent) => {
         // When a card is played, deal damage to a player
         if (event.type === 'CARD_PLAYED') {
           return [
@@ -567,7 +566,7 @@ describe('Event System - TDD Implementation', () => {
       })
 
       manager = publishEvent(manager, cardPlayedEvent)
-      const result = processEvents(manager, game)
+      processEvents(manager, game)
 
       expect(cascadeCallback).toHaveBeenCalled()
       expect(damageCallback).toHaveBeenCalled()

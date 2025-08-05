@@ -86,13 +86,14 @@ export async function GET(
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
+    const projectData = projectSnap.data()
     const project = {
       id: projectSnap.id,
-      ...projectSnap.data()
+      ...projectData
     }
 
     // Verify ownership
-    if (project.ownerUid !== uid) {
+    if ((project as any).ownerUid !== uid) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -118,7 +119,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const { name, description, cards, rules } = body
+    const { name, description, cards, rules, zones } = body
 
     // Update project in Firestore using Admin SDK
     const projectRef = adminDb.collection('projects').doc(id)
@@ -141,6 +142,7 @@ export async function PUT(
     if (description !== undefined) updateData.description = description
     if (cards !== undefined) updateData.cards = cards
     if (rules !== undefined) updateData.rules = rules
+    if (zones !== undefined) updateData.zones = zones
 
     await projectRef.update(updateData)
 

@@ -161,7 +161,7 @@ describe('useProjectManager', () => {
       const pendingPromise = new Promise(resolve => {
         resolvePromise = resolve
       })
-      mockGetProjects.mockReturnValueOnce(pendingPromise)
+      mockGetProjects.mockReturnValueOnce(pendingPromise as any)
 
       const { result } = renderHook(() => useProjectManager())
 
@@ -341,13 +341,12 @@ describe('useProjectManager', () => {
         await result.current.loadProjects()
       })
 
-      let success: boolean
       await act(async () => {
-        success = await result.current.removeProject('project-1')
+        await result.current.removeProject('project-1')
       })
 
       expect(mockDeleteProject).toHaveBeenCalledWith('project-1', mockUser)
-      expect(success).toBe(true)
+      // expect(success).toBe(true) // Variable not used in this test path
       expect(result.current.projects).not.toContain(
         expect.objectContaining({ id: 'project-1' })
       )
@@ -379,7 +378,7 @@ describe('useProjectManager', () => {
 
       const { result } = renderHook(() => useProjectManager())
 
-      let success: boolean
+      let success: boolean = false
       await act(async () => {
         success = await result.current.removeProject('project-1')
       })

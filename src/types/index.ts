@@ -65,6 +65,35 @@ export interface Stack extends Zone {
   readonly type: 'stack';
 }
 
+// Zone Template for Designer (used in Zone Designer and GameBoard)
+export interface ZoneTemplate {
+  readonly id: string;
+  readonly name: string;
+  readonly type: 'deck' | 'hand' | 'discard' | 'playarea' | 'stack';
+  readonly owner: 'player1' | 'player2' | 'shared' | null;
+  readonly visibility: 'public' | 'private';
+  readonly order: 'ordered' | 'unordered';
+  readonly maxSize?: number;
+  readonly description?: string;
+}
+
+// Game Configuration for project-driven setup
+export interface GameConfiguration {
+  readonly initialSetup?: {
+    readonly dealingRules?: {
+      readonly enabled: boolean;
+      readonly handSize: number;
+      readonly shuffleDeck?: boolean;
+      readonly dealingOrder?: 'sequential' | 'round-robin';
+      readonly startingZone?: 'deck' | 'custom';
+      readonly customZoneId?: string;
+    };
+    readonly playerResources?: {
+      readonly [key: string]: number; // e.g., { life: 20, mana: 0, chips: 1000 }
+    };
+  };
+}
+
 export interface Player {
   readonly id: PlayerId;
   readonly name: string;
@@ -78,7 +107,7 @@ export interface Game {
   readonly players: Player[];
   readonly zones: Zone[];
   readonly cards: Card[];
-  readonly currentPlayer: PlayerId;
+  readonly currentPlayer: PlayerId | undefined;
   readonly phase: string;
   readonly turnNumber: number;
   readonly stack: Stack;
@@ -222,6 +251,8 @@ export interface GameProject {
   readonly ownerUid: string;
   readonly cards: Card[];
   readonly rules: GameRule[];
+  readonly zones?: ZoneTemplate[];
+  readonly gameConfig?: GameConfiguration;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }

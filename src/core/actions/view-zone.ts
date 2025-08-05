@@ -21,7 +21,8 @@ export function viewZone(params: ViewZoneParams): GameAction {
 
 // Note: This action doesn't modify game state, just validates permission
 export function handleViewZone(game: Game, action: GameAction): Game {
-  const { playerId, zoneId, count } = action.payload
+  const { playerId, zoneId } = action.payload
+  // count parameter reserved for future partial zone viewing functionality
 
   const player = getGamePlayer(game, playerId)
   const zone = getGameZone(game, zoneId)

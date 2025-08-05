@@ -4,7 +4,7 @@
  */
 
 import { Zone, Deck, Hand, DiscardPile, PlayArea, Stack, CardId, PlayerId, ZoneId } from '@/types'
-import { isValidId, shuffleArray, insertIntoArray, removeFromArray } from '@/lib/utils'
+import { isValidId, shuffleArray, insertIntoArray } from '@/lib/utils'
 
 // Base Zone creation and validation
 

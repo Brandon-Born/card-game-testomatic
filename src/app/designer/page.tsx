@@ -3,12 +3,15 @@
 import React, { useState } from 'react'
 import { RuleDesigner } from '@/components/designer'
 import { CardDesigner } from '@/components/designer/CardDesigner'
+import { ZoneDesigner } from '@/components/designer/ZoneDesigner'
+import type { ZoneTemplate } from '@/types'
 import { ProjectManager } from '@/components/designer/ProjectManager'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Play } from 'lucide-react'
+import Link from 'next/link'
 
 export default function DesignerPage() {
   const { user, signOut } = useAuth()
@@ -17,19 +20,22 @@ export default function DesignerPage() {
   // Project state
   const [currentCards, setCurrentCards] = useState<any[]>([])
   const [currentRules, setCurrentRules] = useState<any[]>([])
+  const [currentZones, setCurrentZones] = useState<ZoneTemplate[]>([])
 
   const handleSignOut = async () => {
     await signOut()
   }
 
-  const handleProjectLoad = (project: { cards: any[], rules: any[] }) => {
+  const handleProjectLoad = (project: { cards: any[], rules: any[], zones?: ZoneTemplate[] }) => {
     setCurrentCards(project.cards)
     setCurrentRules(project.rules)
+    setCurrentZones(project.zones || [])
   }
 
   const handleNewProject = () => {
     setCurrentCards([])
     setCurrentRules([])
+    setCurrentZones([])
   }
 
   return (
@@ -55,9 +61,16 @@ export default function DesignerPage() {
                 <ProjectManager
                   currentCards={currentCards}
                   currentRules={currentRules}
+                  currentZones={currentZones}
                   onProjectLoad={handleProjectLoad}
                   onNewProject={handleNewProject}
                 />
+                <Link href="/simulator">
+                  <Button variant="default" size="sm">
+                    <Play className="w-4 h-4 mr-2" />
+                    Test Game
+                  </Button>
+                </Link>
                 <Button onClick={handleSignOut} variant="outline" size="sm">
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
@@ -70,9 +83,10 @@ export default function DesignerPage() {
         {/* Main content */}
         <div className="flex-1">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-            <TabsList className="grid w-full grid-cols-2 bg-white border-b">
+            <TabsList className="grid w-full grid-cols-3 bg-white border-b">
               <TabsTrigger value="rules">Rules Designer</TabsTrigger>
               <TabsTrigger value="cards">Card Designer</TabsTrigger>
+              <TabsTrigger value="zones">Zone Designer</TabsTrigger>
             </TabsList>
             
             <TabsContent value="rules" className="h-[calc(100vh-120px)] m-0">
@@ -86,6 +100,13 @@ export default function DesignerPage() {
               <CardDesigner 
                 cards={currentCards}
                 onCardsChange={setCurrentCards}
+              />
+            </TabsContent>
+            
+            <TabsContent value="zones" className="h-[calc(100vh-120px)] m-0">
+              <ZoneDesigner 
+                zones={currentZones}
+                onZonesChange={setCurrentZones}
               />
             </TabsContent>
           </Tabs>

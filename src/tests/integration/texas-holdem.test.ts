@@ -4,22 +4,17 @@
  * Tests complex multi-player gameplay, betting rounds, and poker mechanics
  */
 
-import { Game, Player, Card, Zone, GameEvent, EventListener } from '@/types'
+import { Game, Player, Card, Zone, GameEvent } from '@/types'
 import { 
-  createGame, 
-  addPlayerToGame, 
-  addCardToGame, 
-  addZoneToGame,
+  createGame,
   setGamePhase,
-  setCurrentPlayer,
   nextPlayer
 } from '@/core/primitives/game'
-import { createPlayer, modifyPlayerResource } from '@/core/primitives/player'
+import { createPlayer } from '@/core/primitives/player'
 import { createCard } from '@/core/primitives/card'
 import { createDeck, createHand, addCardToZone, createPlayArea } from '@/core/primitives/zone'
 import { 
-  moveCard, 
-  drawCards, 
+  moveCard,
   modifyStat,
   executeAction 
 } from '@/core/actions'
@@ -101,14 +96,14 @@ describe('Texas Hold\'em Integration Test', () => {
       const communityId = createZoneId()
       const potId = createZoneId()
 
-      deck = createDeck({ id: deckId, owner: null })
+      deck = createDeck({ id: deckId, owner: createPlayerId() }) // Use dummy player ID for shared deck
       communityCards = { 
-        ...createPlayArea({ id: communityId, owner: null }),
+        ...createPlayArea({ id: communityId, owner: createPlayerId() }), // Community area
         name: 'Community Cards',
         visibility: 'public' as const
       }
       pot = { 
-        ...createPlayArea({ id: potId, owner: null }),
+        ...createPlayArea({ id: potId, owner: createPlayerId() }), // Pot area
         name: 'Pot'
       }
 
@@ -589,7 +584,7 @@ describe('Texas Hold\'em Integration Test', () => {
           const minBet = event.payload.minBet || 20
           return betAmount < minBet
         },
-        callback: (event: GameEvent, gameState: Game) => {
+        callback: (event: GameEvent) => {
           return [
             createGameEvent({
               type: 'INVALID_BET',
@@ -632,7 +627,7 @@ describe('Texas Hold\'em Integration Test', () => {
       // Add event listener for hand evaluation
       const handEvaluator = createEventListener({
         eventType: 'EVALUATE_HANDS',
-        callback: (event: GameEvent, gameState: Game) => {
+        callback: (event: GameEvent) => {
           const hands = event.payload.hands
           // Simulate hand evaluation logic
           const results = hands.map((hand: any) => ({
@@ -677,10 +672,10 @@ describe('Texas Hold\'em Integration Test', () => {
 
         const cards = createStandardDeck()
         const deckId = createZoneId()
-        let deck = createDeck({ id: deckId, owner: null })
+        let deck = createDeck({ id: deckId, owner: createPlayerId() }) // Shared deck
         
         cards.forEach(card => {
-          deck = addCardToZone(deck, card.id) as Zone
+          deck = { ...addCardToZone(deck, card.id), type: 'deck' as const }
         })
 
         const game = createGame({
@@ -705,7 +700,7 @@ describe('Texas Hold\'em Integration Test', () => {
         // Simulate some poker operations
         let currentGame = setGamePhase(game, 'flop')
         currentGame = nextPlayer(currentGame)
-        currentGame = setGamePhase(currentGame, 'turn')
+        setGamePhase(currentGame, 'turn')
       })
 
       const operationTime = Date.now() - operationStart

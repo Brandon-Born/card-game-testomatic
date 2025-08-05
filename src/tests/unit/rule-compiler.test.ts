@@ -246,10 +246,10 @@ describe('RuleCompiler', () => {
       
       // Test the condition function
       const testEvent = { payload: { cardName: 'Lightning Bolt' } }
-      expect(conditionFn(testEvent)).toBe(true)
+      expect(conditionFn?.({ ...testEvent, id: 'test', type: 'TEST_EVENT', timestamp: new Date(), triggeredBy: 'system' })).toBe(true)
       
       const testEvent2 = { payload: { cardName: 'Fireball' } }
-      expect(conditionFn(testEvent2)).toBe(false)
+      expect(conditionFn?.({ ...testEvent2, id: 'test2', type: 'TEST_EVENT', timestamp: new Date(), triggeredBy: 'system' })).toBe(false)
     })
 
     it('should use default priority when not specified', () => {

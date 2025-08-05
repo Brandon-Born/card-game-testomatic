@@ -6,6 +6,8 @@ export interface ProjectData {
   description: string
   cards: any[]
   rules: any[]
+  zones?: any[]
+  gameConfig?: any
   ownerUid?: string
   createdAt?: string
   updatedAt?: string
@@ -48,7 +50,7 @@ async function apiRequest<T>(
     if (user) {
       const token = await getIdToken(user)
       if (token) {
-        headers.Authorization = `Bearer ${token}`
+        (headers as any).Authorization = `Bearer ${token}`
       }
     }
 

@@ -5,8 +5,8 @@
 
 import { Game, ModifyStatAction, GameAction } from '@/types'
 import { updateGame, getGamePlayer, getGameCard } from '@/core/primitives/game'
-import { updatePlayer, modifyPlayerResource } from '@/core/primitives/player'
-import { updateCard, setCardProperty, getCardProperty } from '@/core/primitives/card'
+import { modifyPlayerResource } from '@/core/primitives/player'
+import { setCardProperty, getCardProperty } from '@/core/primitives/card'
 
 export interface ModifyStatParams {
   target: any // CardId or PlayerId

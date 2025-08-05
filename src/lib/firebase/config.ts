@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, connectAuthEmulator } from 'firebase/auth'
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
+// connectAuthEmulator and connectFirestoreEmulator reserved for development setup
 
 // Check if Firebase is configured
 const isFirebaseConfigured = () => {

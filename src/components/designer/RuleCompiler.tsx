@@ -2,10 +2,7 @@
 
 import { Node, Edge } from '@xyflow/react'
 import { createEventListener, createGameEvent } from '@/core/events'
-import { 
-  drawCards, playCard, moveCard, modifyStat, tapCard, untapCard,
-  discardCard, shuffleZone, addCounter, removeCounter, setTurnPhase, viewZone
-} from '@/core/actions'
+// Action functions are not directly used - RuleCompiler generates events instead
 import type { GameEvent, EventListener, Game } from '@/types'
 
 export interface VisualRule {
@@ -49,8 +46,8 @@ export class RuleCompiler {
       if (connectedActions.length > 0) {
         rules.push({
           id: `rule-${trigger.id}`,
-          name: trigger.data.label || 'Unnamed Rule',
-          description: `${trigger.data.label} → ${connectedActions.map(a => a.data.label).join(', ')}`,
+          name: (trigger.data as any).label || 'Unnamed Rule',
+          description: `${(trigger.data as any).label} → ${connectedActions.map(a => (a.data as any).label).join(', ')}`,
           trigger,
           actions: connectedActions,
           isActive: true
@@ -68,8 +65,8 @@ export class RuleCompiler {
     const { trigger, actions } = rule
     
     // Create the condition function from trigger data
-    const condition = trigger.data.condition ? 
-      new Function('event', `return ${trigger.data.condition}`) : 
+    const condition = (trigger.data as any).condition ? 
+      new Function('event', `return ${(trigger.data as any).condition}`) as ((event: GameEvent) => boolean) : 
       undefined
 
     // Create the callback function that executes all connected actions
@@ -101,14 +98,11 @@ export class RuleCompiler {
     // Create the EventListener
     const eventListener = createEventListener({
       id: rule.id,
-      eventType: trigger.data.eventType,
+      eventType: (trigger.data as any).eventType,
       callback,
       condition,
-      priority: trigger.data.priority || 1
+      priority: (trigger.data as any).priority || 1
     })
-    
-    // Override the auto-generated ID to match our rule ID
-    eventListener.id = rule.id
 
     return {
       id: rule.id,
@@ -121,7 +115,7 @@ export class RuleCompiler {
    * Execute a single action node and return the resulting game event
    */
   private static executeAction(actionNode: Node, triggerEvent: GameEvent, game: Game): GameEvent | null {
-    const { actionType, parameters } = actionNode.data
+    const { actionType, parameters } = actionNode.data as any
     
     // Resolve parameter values (support for event context variables)
     const resolvedParams = this.resolveParameters(parameters, triggerEvent, game)
@@ -248,9 +242,9 @@ export class RuleCompiler {
       if (typeof value === 'string') {
         // Support event context variables
         resolved[key] = value
-          .replace(/\$event\.payload\.(\w+)/g, (_, prop) => event.payload[prop] || '')
-          .replace(/\$event\.triggeredBy/g, event.triggeredBy)
-          .replace(/\$game\.currentPlayer/g, game.currentPlayer.value)
+          .replace(/\$event\.payload\.(\w+)/g, (_, prop) => String(event.payload[prop] || ''))
+          .replace(/\$event\.triggeredBy/g, String(event.triggeredBy))
+          .replace(/\$game\.currentPlayer/g, String(game.currentPlayer?.value || ''))
       } else {
         resolved[key] = String(value)
       }
@@ -283,16 +277,16 @@ import type { Game, GameEvent } from '@/types'
 // ${rule.originalRule.description}
 const ${rule.id.replace(/-/g, '_')} = createEventListener({
   id: '${rule.id}',
-  eventType: '${trigger.data.eventType}',
-  priority: ${trigger.data.priority || 1},
-  ${trigger.data.condition ? `condition: (event) => ${trigger.data.condition},` : ''}
+  eventType: '${(trigger.data as any).eventType}',
+  priority: ${(trigger.data as any).priority || 1},
+  ${(trigger.data as any).condition ? `condition: (event) => ${(trigger.data as any).condition},` : ''}
   callback: (event, game) => {
     const events = []
     ${actions.map(action => `
-    // Action: ${action.data.label}
+    // Action: ${(action.data as any).label}
     events.push(createGameEvent({
-      type: '${action.data.actionType.replace(/([A-Z])/g, '_$1').toUpperCase()}_REQUESTED',
-      payload: ${JSON.stringify(action.data.parameters, null, 6)}
+      type: '${((action.data as any).actionType).replace(/([A-Z])/g, '_$1').toUpperCase()}_REQUESTED',
+      payload: ${JSON.stringify((action.data as any).parameters, null, 6)}
     }))`).join('')}
     return events
   }

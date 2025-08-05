@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Play } from "lucide-react";
 
 export default function Home() {
   const { user, signOut } = useAuth();
@@ -69,11 +69,19 @@ export default function Home() {
                   <User className="w-4 h-4" />
                   Signed in as {user.email}
                 </div>
-                <Link href="/designer">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors">
-                    Continue to Designer
-                  </button>
-                </Link>
+                <div className="flex gap-4 justify-center">
+                  <Link href="/designer">
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors">
+                      Continue to Designer
+                    </button>
+                  </Link>
+                  <Link href="/simulator">
+                    <Button className="py-4 px-8 text-lg">
+                      <Play className="w-5 h-5 mr-2" />
+                      Test Games
+                    </Button>
+                  </Link>
+                </div>
                 <div className="flex justify-center">
                   <Button 
                     variant="outline" 

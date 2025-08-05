@@ -13,7 +13,7 @@ interface TriggerNodeData {
   condition?: string
 }
 
-export function TriggerNode({ data, selected }: NodeProps<TriggerNodeData>) {
+export function TriggerNode({ data, selected }: NodeProps & { data: TriggerNodeData }) {
   return (
     <Card className={`min-w-[200px] transition-all ${
       selected ? 'ring-2 ring-blue-500 shadow-lg' : 'shadow-md'

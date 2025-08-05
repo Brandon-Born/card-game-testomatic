@@ -16,20 +16,14 @@
 
 import { Game, Player, Card, Zone } from '@/types';
 import { 
-  createGame, 
-  addPlayerToGame, 
-  addCardToGame, 
-  addZoneToGame,
+  createGame,
   setGamePhase,
-  setCurrentPlayer,
-  nextPlayer
 } from '@/core/primitives/game';
-import { createPlayer, modifyPlayerResource } from '@/core/primitives/player';
+import { createPlayer } from '@/core/primitives/player';
 import { createCard } from '@/core/primitives/card';
 import { createDeck, createHand, addCardToZone, createPlayArea } from '@/core/primitives/zone';
 import { 
-  moveCard, 
-  drawCards,
+  moveCard,
   modifyStat,
   executeAction 
 } from '@/core/actions';
@@ -75,7 +69,7 @@ describe('Spades Integration Test', () => {
   };
 
   // Spades-specific trick evaluation logic
-  const evaluateTrick = (cards: Card[], leadSuit: string, spadesBroken: boolean) => {
+  const evaluateTrick = (cards: Card[], leadSuit: string) => {
     const trumpCards = cards.filter(c => c.properties.isSpade);
     
     if (trumpCards.length > 0) {
@@ -194,7 +188,6 @@ describe('Spades Integration Test', () => {
 
     it('should deal 13 cards to each player', () => {
       let currentGame = game;
-      const deck = currentGame.zones.find(z => z.name === 'Deck')!;
       
       // Deal cards clockwise starting with North
       for (let cardNum = 0; cardNum < 13; cardNum++) {
@@ -323,7 +316,7 @@ describe('Spades Integration Test', () => {
     });
 
     it('should implement spades breaking rules', () => {
-      let currentGame = game;
+      const currentGame = game;
       
       // Initially spades are not broken
       expect(currentGame.globalProperties.spadesBroken).toBe(false);
@@ -339,7 +332,7 @@ describe('Spades Integration Test', () => {
     });
 
     it('should calculate Spades scoring correctly', () => {
-      let currentGame = game;
+      const currentGame = game;
 
       // Set up a scoring scenario
       const north = currentGame.players.find(p => p.name === 'North')!;
@@ -381,7 +374,7 @@ describe('Spades Integration Test', () => {
     });
 
     it('should handle nil bidding scoring', () => {
-      let currentGame = game;
+      const currentGame = game;
       
       // South bids nil and makes it (takes 0 tricks)
       const south = currentGame.players.find(p => p.name === 'South')!;
@@ -409,7 +402,7 @@ describe('Spades Integration Test', () => {
     });
 
     it('should handle failed nil bidding', () => {
-      let currentGame = game;
+      const currentGame = game;
       
       // South bids nil but takes 1 trick (fails)
       const south = currentGame.players.find(p => p.name === 'South')!;
@@ -435,7 +428,7 @@ describe('Spades Integration Test', () => {
     });
 
     it('should handle sandbag penalties', () => {
-      let currentGame = game;
+      const currentGame = game;
       
       // Team has 9 bags already
       currentGame.globalProperties.northSouthBags = 9;
@@ -455,7 +448,7 @@ describe('Spades Integration Test', () => {
     });
 
     it('should determine game winner at 500 points', () => {
-      let currentGame = game;
+      const currentGame = game;
       
       // North/South approaches 500
       currentGame.globalProperties.northSouthScore = 485;
