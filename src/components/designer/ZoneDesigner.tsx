@@ -40,8 +40,7 @@ export function ZoneDesigner({ zones, onZonesChange }: ZoneDesignerProps) {
   ]
 
   const ownerOptions = [
-    { value: 'player1', label: 'Player 1' },
-    { value: 'player2', label: 'Player 2' },
+    { value: 'each', label: 'Each Player' },
     { value: 'shared', label: 'Shared/Public' }
   ]
 
@@ -56,9 +55,9 @@ export function ZoneDesigner({ zones, onZonesChange }: ZoneDesignerProps) {
   const handleAddZone = () => {
     const newZone: ZoneTemplate = {
       id: createZoneId().value,
-      name: '',
+      name: 'New Zone',
       type: 'hand',
-      owner: 'player1',
+      owner: 'each',
       visibility: 'private',
       order: 'ordered'
     }
@@ -108,83 +107,52 @@ export function ZoneDesigner({ zones, onZonesChange }: ZoneDesignerProps) {
 
   const createDefaultZones = () => {
     const defaultZones: ZoneTemplate[] = [
-      // Player 1 zones
       {
         id: createZoneId().value,
-        name: 'Player 1 Deck',
+        name: 'Deck',
         type: 'deck',
-        owner: 'player1',
+        owner: 'each',
         visibility: 'private',
         order: 'unordered',
         maxSize: 60,
-        description: 'Player 1\'s main deck'
+        description: 'Each player\'s main deck'
       },
       {
         id: createZoneId().value,
-        name: 'Player 1 Hand',
+        name: 'Hand',
         type: 'hand',
-        owner: 'player1',
+        owner: 'each',
         visibility: 'private',
         order: 'ordered',
         maxSize: 7,
-        description: 'Player 1\'s hand'
+        description: 'Each player\'s hand of cards'
       },
       {
         id: createZoneId().value,
-        name: 'Player 1 Play Area',
+        name: 'Play Area',
         type: 'playarea',
-        owner: 'player1',
+        owner: 'each',
         visibility: 'public',
         order: 'unordered',
-        description: 'Player 1\'s battlefield/tableau'
+        description: 'Each player\'s area for cards in play'
       },
       {
         id: createZoneId().value,
-        name: 'Player 1 Discard',
+        name: 'Discard Pile',
         type: 'discard',
-        owner: 'player1',
+        owner: 'each',
         visibility: 'public',
         order: 'unordered',
-        description: 'Player 1\'s discard pile'
-      },
-      // Player 2 zones
-      {
-        id: createZoneId().value,
-        name: 'Player 2 Deck',
-        type: 'deck',
-        owner: 'player2',
-        visibility: 'private',
-        order: 'unordered',
-        maxSize: 60,
-        description: 'Player 2\'s main deck'
+        description: 'Each player\'s discard pile'
       },
       {
         id: createZoneId().value,
-        name: 'Player 2 Hand',
-        type: 'hand',
-        owner: 'player2',
-        visibility: 'private',
-        order: 'ordered',
-        maxSize: 7,
-        description: 'Player 2\'s hand'
-      },
-      {
-        id: createZoneId().value,
-        name: 'Player 2 Play Area',
-        type: 'playarea',
-        owner: 'player2',
-        visibility: 'public',
-        order: 'unordered',
-        description: 'Player 2\'s battlefield/tableau'
-      },
-      {
-        id: createZoneId().value,
-        name: 'Player 2 Discard',
+        name: 'Graveyard',
         type: 'discard',
-        owner: 'player2',
+        owner: 'shared',
         visibility: 'public',
         order: 'unordered',
-        description: 'Player 2\'s discard pile'
+        description: 'A shared discard pile for all players'
       }
     ]
     
@@ -363,7 +331,7 @@ export function ZoneDesigner({ zones, onZonesChange }: ZoneDesignerProps) {
                   value={editingZone?.owner || 'shared'}
                   onValueChange={(value) => setEditingZone(prev => prev ? { 
                     ...prev, 
-                    owner: value === 'shared' ? 'shared' : value as 'player1' | 'player2'
+                    owner: value as 'each' | 'shared' | null
                   } : null)}
                 >
                   <SelectTrigger>

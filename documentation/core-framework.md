@@ -66,6 +66,30 @@ interface Zone {
 
 **Test Coverage:** 30 tests covering all zone types, operations, and edge cases.
 
+### ZoneTemplate Object (Designer)
+
+For the visual designer, a `ZoneTemplate` is used to define how zones are created for a game. This provides a more user-friendly way to manage zone creation for games with a variable number of players.
+
+```typescript
+interface ZoneTemplate {
+  readonly id: string;
+  readonly name: string;
+  readonly type: 'deck' | 'hand' | 'discard' | 'playarea' | 'stack';
+  readonly owner: 'each' | 'shared' | null;
+  readonly visibility: 'public' | 'private';
+  readonly order: 'ordered' | 'unordered';
+  readonly maxSize?: number;
+}
+```
+
+**Ownership Types:**
+
+-   `'each'`: This is the most powerful option. When the game starts, the system will automatically create a distinct instance of this zone for every player in the game. This is ideal for zones like "Hand", "Deck", or "Discard Pile" that each player needs their own copy of.
+-   `'shared'`: A single, public zone that is shared by all players. Perfect for a central play area or a shared discard pile like a "Graveyard".
+-   `null`: Functionally the same as `'shared'`.
+
+This template system allows designers to define a single "Hand" zone with the owner set to `'each'`, and the simulator will ensure that in a 6-player game, all 6 players get their own hand.
+
 ### Player Object
 ```typescript
 interface Player {

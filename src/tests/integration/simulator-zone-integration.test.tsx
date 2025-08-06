@@ -18,110 +18,122 @@ jest.mock('@/hooks/useProjectManager', () => ({
 }))
 
 describe('Simulator Zone Integration', () => {
-  it('should use custom zones from project data instead of hardcoded zones', async () => {
-    // Define custom zones that differ from the default setup
+  it('should create zones for each player when owner is "each"', async () => {
     const customZones: ZoneTemplate[] = [
       {
-        id: 'custom-zone-1',
-        name: 'Player 1 Library',
+        id: 'custom-deck',
+        name: 'Library',
         type: 'deck',
-        owner: 'player1',
+        owner: 'each',
         visibility: 'private',
         order: 'ordered',
-        maxSize: 40, // Different from default 60
-        description: 'Custom library zone'
+        maxSize: 40,
       },
       {
-        id: 'custom-zone-2',
-        name: 'Player 1 Hand of Cards',
+        id: 'custom-hand',
+        name: 'Hand of Cards',
         type: 'hand',
-        owner: 'player1',
+        owner: 'each',
         visibility: 'private',
-        order: 'unordered', // Different from default ordered
-        maxSize: 10, // Different from default 7
-        description: 'Custom hand zone'
+        order: 'unordered',
+        maxSize: 10,
       },
       {
-        id: 'custom-zone-3',
-        name: 'Shared Battle Area',
+        id: 'custom-battlefield',
+        name: 'Battle Area',
         type: 'playarea',
         owner: 'shared',
         visibility: 'public',
         order: 'unordered',
-        description: 'Shared battlefield'
       },
-      {
-        id: 'custom-zone-4',
-        name: 'Player 2 Collection',
-        type: 'deck',
-        owner: 'player2',
-        visibility: 'private',
-        order: 'unordered', // Different from default ordered
-        maxSize: 50,
-        description: 'Player 2 custom deck'
-      }
-    ]
+    ];
 
     const projectData = {
-      name: 'Custom Zone Test Project',
-      cards: [
-        { name: 'Test Card 1', text: 'A test card', type: 'Creature' },
-        { name: 'Test Card 2', text: 'Another test card', type: 'Spell' }
-      ],
+      name: 'Each Player Zone Test',
+      cards: [],
       rules: [],
-      zones: customZones
-    }
+      zones: customZones,
+      gameConfig: { playerCount: { min: 2, max: 4 } }, // Default 2 players
+    };
 
-    render(<GameBoard projectData={projectData} />)
+    render(<GameBoard projectData={projectData} />);
 
-    // Wait for the game to initialize
     await waitFor(() => {
-      // Check that custom zones message appears in game log
-      expect(screen.getByText(/Custom Zones/)).toBeInTheDocument()
-      expect(screen.getByText(/Loaded 4 custom zones from project/)).toBeInTheDocument()
-    })
+      // 2 "each" templates * 2 players + 1 "shared" template = 5 zones
+      expect(screen.getByText(/Loaded 5 zones from project templates/)).toBeInTheDocument();
+    });
 
-    // Verify that custom zone names are used instead of defaults
+    // Verify zones were created for each player
     await waitFor(() => {
-      expect(screen.getByText('Player 1 Library')).toBeInTheDocument()
-      expect(screen.getByText('Player 1 Hand of Cards')).toBeInTheDocument()
-      expect(screen.getByText('Shared: Shared Battle Area')).toBeInTheDocument() // Shared zones show with "Shared:" prefix
-      expect(screen.getByText('Player 2 Collection')).toBeInTheDocument()
-    })
+      expect(screen.getByText('Player 1 Library')).toBeInTheDocument();
+      expect(screen.getByText('Player 2 Library')).toBeInTheDocument();
+      expect(screen.getByText('Player 1 Hand of Cards')).toBeInTheDocument();
+      expect(screen.getByText('Player 2 Hand of Cards')).toBeInTheDocument();
+      expect(screen.getByText('Shared: Battle Area')).toBeInTheDocument();
+    });
+  });
 
-    // Verify that default zone names are NOT present (checking specific default zones)
-    // Note: "Battlefield" header is always shown, but check that default "Play Area" zones aren't present
-    expect(screen.queryByText('Play Area')).not.toBeInTheDocument() // Default PlayArea name
-    expect(screen.queryByText('Discard Pile')).not.toBeInTheDocument() // Default DiscardPile name
-    expect(screen.queryByText('Deck')).not.toBeInTheDocument() // Default Deck name (before transformation)
-  })
+  it('should handle "each" owner property for a different player count', async () => {
+    const customZones: ZoneTemplate[] = [
+      {
+        id: 'player-deck',
+        name: 'Deck',
+        type: 'deck',
+        owner: 'each',
+        visibility: 'private',
+        order: 'ordered',
+      },
+    ];
 
-  it('should validate zone configuration and handle edge cases', async () => {
+    const projectData = {
+      name: '3 Player Game',
+      cards: [],
+      rules: [],
+      zones: customZones,
+      gameConfig: { playerCount: { min: 3, max: 3 } }, // 3 players
+    };
+
+    render(<GameBoard projectData={projectData} />);
+
+    await waitFor(() => {
+      // 1 "each" template * 3 players = 3 zones
+      expect(screen.getByText(/Loaded 3 zones from project templates/)).toBeInTheDocument();
+    });
+
+    // Verify zones were created for all 3 players
+    await waitFor(() => {
+      expect(screen.getByText('Player 1 Deck')).toBeInTheDocument();
+      expect(screen.getByText('Player 2 Deck')).toBeInTheDocument();
+      expect(screen.getByText('Player 3 Deck')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle minimal zone configuration and shared zones', async () => {
     const customZones: ZoneTemplate[] = [
       {
         id: 'minimal-zone',
-        name: 'Minimal Zone',
-        type: 'deck',
-        owner: 'player1',
-        visibility: 'private',
-        order: 'ordered'
-        // No maxSize, description - should handle optional fields
-      }
-    ]
+        name: 'Minimal Shared Zone',
+        type: 'playarea',
+        owner: 'shared', // Explicitly shared
+        visibility: 'public',
+        order: 'unordered',
+      },
+    ];
 
     const projectData = {
-      name: 'Minimal Zone Test',
+      name: 'Minimal Shared Test',
       cards: [],
       rules: [],
-      zones: customZones
-    }
+      zones: customZones,
+      gameConfig: { playerCount: { min: 2, max: 2 } },
+    };
 
-    render(<GameBoard projectData={projectData} />)
+    render(<GameBoard projectData={projectData} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Custom Zones/)).toBeInTheDocument()
-      expect(screen.getByText(/Loaded 1 custom zones from project/)).toBeInTheDocument()
-      expect(screen.getByText('Minimal Zone')).toBeInTheDocument()
-    })
-  })
-})
+      // 1 "shared" template = 1 zone
+      expect(screen.getByText(/Loaded 1 zones from project templates/)).toBeInTheDocument();
+      expect(screen.getByText('Shared: Minimal Shared Zone')).toBeInTheDocument();
+    });
+  });
+});

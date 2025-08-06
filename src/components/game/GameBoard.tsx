@@ -37,75 +37,10 @@ export default function GameBoard({ projectData }: GameBoardProps) {
 
   // useEffect moved after initializeGame function to avoid hoisting issues
 
-  // Helper function to create zones from templates
-  const createZoneFromTemplate = (template: ZoneTemplate, players: any[]): Zone => {
-    const ownerIndex = template.owner ? parseInt(template.owner.replace('player', ''), 10) - 1 : -1;
-    const ownerId = ownerIndex >= 0 && ownerIndex < players.length ? players[ownerIndex].id : null;
-
-    const zoneId = createZoneId()
-    switch (template.type) {
-      case 'deck':
-        return {
-          ...createDeck({ 
-            id: zoneId, 
-            owner: ownerId,
-            maxSize: template.maxSize 
-          }),
-          name: template.name // Override the default name
-        }
-      case 'hand':
-        return {
-          ...createHand({ 
-            id: zoneId, 
-            owner: ownerId,
-            maxSize: template.maxSize 
-          }),
-          name: template.name
-        }
-      case 'discard':
-        return {
-          ...createDiscardPile({ 
-            id: zoneId, 
-            owner: ownerId
-          }),
-          name: template.name,
-          ...(template.maxSize && { maxSize: template.maxSize })
-        }
-      case 'playarea':
-        return {
-          ...createPlayArea({ 
-            id: zoneId, 
-            owner: ownerId
-          }),
-          name: template.name,
-          ...(template.maxSize && { maxSize: template.maxSize })
-        }
-      case 'stack':
-        // For now, create as PlayArea since we don't have createStack yet
-        return {
-          ...createPlayArea({ 
-            id: zoneId, 
-            owner: ownerId
-          }),
-          name: template.name,
-          ...(template.maxSize && { maxSize: template.maxSize })
-        }
-      default:
-        return {
-          ...createPlayArea({ 
-            id: zoneId, 
-            owner: ownerId
-          }),
-          name: template.name,
-          ...(template.maxSize && { maxSize: template.maxSize })
-        }
-    }
-  }
-
   const initializeGame = useCallback(() => {
     try {
-      const playerCount = projectData?.gameConfig?.playerCount?.min || 2
-      const configuredResources = projectData?.gameConfig?.initialSetup?.playerResources || {}
+      const playerCount = projectData?.gameConfig?.playerCount?.min || 2;
+      const configuredResources = projectData?.gameConfig?.initialSetup?.playerResources || {};
 
       const players = Array.from({ length: playerCount }, (_, i) =>
         createPlayer({
@@ -113,21 +48,54 @@ export default function GameBoard({ projectData }: GameBoardProps) {
           name: `Player ${i + 1}`,
           resources: { ...configuredResources },
         })
-      )
+      );
 
-      let gameZones: Zone[] = []
-      const playerZoneMap: { [key: string]: string[] } = {}
-      players.forEach(p => playerZoneMap[p.id.value] = [])
+      let gameZones: Zone[] = [];
+      const playerZoneMap: { [key: string]: string[] } = {};
+      players.forEach(p => playerZoneMap[p.id.value] = []);
+
+      // Helper function to create a single zone instance from a template
+      const createZoneFromTemplate = (template: ZoneTemplate, ownerId: any): Zone => {
+        const zoneId = createZoneId();
+        const baseProps = {
+          id: zoneId,
+          owner: ownerId,
+          maxSize: template.maxSize,
+        };
+        const name = ownerId ? `${players.find(p => p.id === ownerId)?.name} ${template.name}` : template.name;
+
+        switch (template.type) {
+          case 'deck':
+            return { ...createDeck(baseProps), name };
+          case 'hand':
+            return { ...createHand(baseProps), name };
+          case 'discard':
+            return { ...createDiscardPile(baseProps), name };
+          case 'playarea':
+            return { ...createPlayArea(baseProps), name };
+          case 'stack':
+            return { ...createPlayArea(baseProps), name: template.name, visibility: 'public' as const, order: 'ordered' as const };
+          default:
+            return { ...createPlayArea(baseProps), name };
+        }
+      };
 
       if (projectData?.zones && projectData.zones.length > 0) {
-        gameZones = projectData.zones.map((template: ZoneTemplate) => {
-          const zone = createZoneFromTemplate(template, players)
-          if (zone.owner) {
-            playerZoneMap[zone.owner.value]?.push(zone.id.value)
+        projectData.zones.forEach((template: ZoneTemplate) => {
+          if (template.owner === 'each') {
+            // Create a zone for each player
+            players.forEach(player => {
+              const zone = createZoneFromTemplate(template, player.id);
+              gameZones.push(zone);
+              playerZoneMap[player.id.value]?.push(zone.id.value);
+            });
+          } else {
+            // Create a single shared zone
+            const zone = createZoneFromTemplate(template, null);
+            gameZones.push(zone);
           }
-          return zone
-        })
-        addToGameLog('Custom Zones', `Loaded ${gameZones.length} custom zones from project`, 'system')
+        });
+        addToGameLog('Custom Zones', `Loaded ${gameZones.length} zones from project templates`, 'system');
       }
 
       const gameCards: GameCard[] = projectData?.cards?.map(cardData => {
