@@ -70,7 +70,7 @@ export interface ZoneTemplate {
   readonly id: string;
   readonly name: string;
   readonly type: 'deck' | 'hand' | 'discard' | 'playarea' | 'stack';
-  readonly owner: 'player1' | 'player2' | 'shared' | null;
+  readonly owner: 'each' | 'shared' | null;
   readonly visibility: 'public' | 'private';
   readonly order: 'ordered' | 'unordered';
   readonly maxSize?: number;

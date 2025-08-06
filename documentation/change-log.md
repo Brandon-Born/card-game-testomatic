@@ -1,5 +1,27 @@
 ### Agent Change Log by Run
 
+#### 2025-08-06 - DYNAMIC 'EACH PLAYER' ZONE OWNERSHIP IMPLEMENTATION ✅
+**Timestamp**: 2025-08-06T13:24:00Z
+
+**Major Feature**: Implemented a dynamic "Each Player" zone ownership system, removing hardcoded "Player 1" and "Player 2" concepts.
+
+**New Features Added**:
+- **✨ 'Each Player' Zone Owner**: A new `each` option in the Zone Designer for the owner property.
+- **⚙️ Automatic Zone Instantiation**: When a zone template's owner is set to `each`, the game simulator automatically creates a distinct instance of that zone for every player in the game.
+- **📈 Scalable Game Design**: Designers can now create zone templates that scale automatically with the number of players (from 2 to 6 or more), without needing to create separate zones for each player manually.
+- **🧹 Cleaner UI**: The Zone Designer is simplified, removing the confusing "Player 1" and "Player 2" options in favor of the more intuitive "Each Player" and "Shared/Public" options.
+- **💡 Smarter Default Zones**: The "Create Default Zones" feature now creates a single set of templates (Deck, Hand, Discard, etc.) using the `each` owner property, resulting in a cleaner and more flexible starting setup.
+
+**Technical Implementation**:
+- **Enhanced `ZoneTemplate` Type**: The `owner` property in the `ZoneTemplate` interface in `src/types/index.ts` was updated from `'player1' | 'player2' | 'shared' | null` to `'each' | 'shared' | null`.
+- **Refactored `ZoneDesigner.tsx`**: The UI component for designing zones was updated to remove hardcoded player options and introduce the new `each` option. The default zone creation logic was also streamlined.
+- **Updated `GameBoard.tsx`**: The game initialization logic was significantly refactored. The simulator now iterates through zone templates and, if `owner` is `each`, it creates a zone for each player in the game.
+- **Comprehensive Testing**: Updated the `simulator-zone-integration.test.tsx` to validate the new "each player" functionality, ensuring that the correct number of zones are created for various player counts. All tests are passing.
+
+**Impact**: This change fundamentally improves the scalability and usability of the game designer. It removes a major limitation of the previous system, allowing for the creation of games with flexible player counts without redundant configuration. The user experience is simplified and more powerful.
+
+---
+
 #### 2025-01-13 - PROJECT-DRIVEN AUTOMATIC CARD DEALING IMPLEMENTATION ✅
 **Timestamp**: 2025-01-13T08:00:00Z
 
