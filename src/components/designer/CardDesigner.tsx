@@ -9,27 +9,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash2, Edit } from 'lucide-react'
+import { CardTemplate } from '@/types'
 
-interface GameCard {
-  id: string
-  name: string
-  text: string
-  type: string
-  cost: number
-  power?: number
-  toughness?: number
-  properties: Record<string, any>
-}
-
-const initialCards: GameCard[] = []
+const initialCards: CardTemplate[] = []
 
 interface CardDesignerProps {
-  cards?: GameCard[]
-  onCardsChange?: (cards: GameCard[]) => void
+  cards?: CardTemplate[]
+  onCardsChange?: (cards: CardTemplate[]) => void
 }
 
 export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerProps) {
-  const [cards, setCards] = useState<GameCard[]>(propCards || initialCards)
+  const [cards, setCards] = useState<CardTemplate[]>(propCards || initialCards)
   
   // Update local state when props change
   React.useEffect(() => {
@@ -37,18 +27,19 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
       setCards(propCards)
     }
   }, [propCards])
-  const [selectedCard, setSelectedCard] = useState<GameCard | null>(null)
+  const [selectedCard, setSelectedCard] = useState<CardTemplate | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [editForm, setEditForm] = useState<Partial<GameCard>>({})
+  const [editForm, setEditForm] = useState<Partial<CardTemplate>>({})
 
   const handleCreateCard = () => {
-    const newCard: GameCard = {
+    const newCard: CardTemplate = {
       id: `card-${Date.now()}`,
       name: 'New Card',
       text: 'Enter card description...',
       type: 'Spell',
       cost: 0,
-      properties: {}
+      properties: {},
+      copies: 1,
     }
     const updatedCards = [...cards, newCard]
     setCards(updatedCards)
@@ -58,7 +49,7 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
     setIsEditing(true)
   }
 
-  const handleEditCard = (card: GameCard) => {
+  const handleEditCard = (card: CardTemplate) => {
     setSelectedCard(card)
     setEditForm(card)
     setIsEditing(true)
@@ -77,11 +68,11 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
     if (!editForm.id) return
     
     const updatedCards = cards.map(card => 
-      card.id === editForm.id ? { ...card, ...editForm } as GameCard : card
+      card.id === editForm.id ? { ...card, ...editForm } as CardTemplate : card
     )
     setCards(updatedCards)
     onCardsChange?.(updatedCards)
-    setSelectedCard({ ...selectedCard, ...editForm } as GameCard)
+    setSelectedCard({ ...selectedCard, ...editForm } as CardTemplate)
     setIsEditing(false)
   }
 
@@ -118,6 +109,7 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
                     <div className="flex gap-1 mt-1">
                       <Badge variant="outline" className="text-xs">{card.type}</Badge>
                       <Badge variant="secondary" className="text-xs">Cost: {card.cost}</Badge>
+                      <Badge variant="default" className="text-xs">x{card.copies}</Badge>
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -175,6 +167,18 @@ export function CardDesigner({ cards: propCards, onCardsChange }: CardDesignerPr
                         type="number"
                         value={editForm.cost || 0}
                         onChange={(e) => setEditForm({ ...editForm, cost: parseInt(e.target.value) })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="copies">Copies</Label>
+                      <Input
+                        id="copies"
+                        type="number"
+                        value={editForm.copies || 1}
+                        onChange={(e) => setEditForm({ ...editForm, copies: parseInt(e.target.value) })}
                       />
                     </div>
                   </div>

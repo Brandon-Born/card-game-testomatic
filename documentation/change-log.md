@@ -1,5 +1,27 @@
 ### Agent Change Log by Run
 
+#### 2025-08-06 - CARD COPIES IN DECK IMPLEMENTATION ✅
+**Timestamp**: 2025-08-06T14:18:00Z
+
+**Major Feature**: Added the concept of "# of copies" to the card designer, simplifying the process for creating decks with multiple instances of the same card.
+
+**New Features Added**:
+- **✨ Card Copies Input**: A new "Copies" field in the Card Designer allows users to specify how many instances of a card should be included in the deck.
+- **⚙️ Simplified Deck Building**: Instead of creating duplicate cards manually, designers can now define a card once and set the number of copies.
+- **🎮 Accurate Game Simulation**: The game simulator now correctly creates a card instance for each copy specified, ensuring the deck composition is accurate for playtesting.
+- ** M-^Y User Interface**: The card list in the designer now displays a badge indicating the number of copies for each card (`x4`, `x2`, etc.).
+
+**Technical Implementation**:
+- **New `CardTemplate` Interface**: Created a new `CardTemplate` type in `src/types/index.ts` to represent a card's design, including the new `copies: number` field.
+- **Updated `GameProject`**: The `GameProject` interface now uses an array of `CardTemplate` instead of `Card`, separating card design from in-game card instances.
+- **Enhanced `CardDesigner.tsx`**: The Card Designer UI was updated to include the "Copies" input field and a display badge. The component now uses the `CardTemplate` type.
+- **Adapted `GameBoard.tsx`**: The game initialization logic was modified to use `flatMap` to create the correct number of card instances based on the `copies` property of each `CardTemplate`.
+- **Dependency Management**: Updated `next` package to resolve testing conflicts.
+
+**Impact**: This feature significantly improves the user experience for game designers, making it much faster and more intuitive to create and manage decks with multiple copies of cards. It also ensures that the game simulation accurately reflects the intended deck composition.
+
+---
+
 #### 2025-08-06 - DYNAMIC 'EACH PLAYER' ZONE OWNERSHIP IMPLEMENTATION ✅
 **Timestamp**: 2025-08-06T13:24:00Z
 
