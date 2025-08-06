@@ -38,12 +38,11 @@ export default function GameBoard({ projectData }: GameBoardProps) {
   // useEffect moved after initializeGame function to avoid hoisting issues
 
   // Helper function to create zones from templates
-  const createZoneFromTemplate = (template: ZoneTemplate, player1Id: any, player2Id: any): Zone => {
-    const ownerId = template.owner === 'player1' ? player1Id : 
-                   template.owner === 'player2' ? player2Id : null
+  const createZoneFromTemplate = (template: ZoneTemplate, players: any[]): Zone => {
+    const ownerIndex = template.owner ? parseInt(template.owner.replace('player', ''), 10) - 1 : -1;
+    const ownerId = ownerIndex >= 0 && ownerIndex < players.length ? players[ownerIndex].id : null;
 
     const zoneId = createZoneId()
-    
     switch (template.type) {
       case 'deck':
         return {
@@ -105,85 +104,40 @@ export default function GameBoard({ projectData }: GameBoardProps) {
 
   const initializeGame = useCallback(() => {
     try {
-      // Create players based on project zones or default to 2-player
-      const playersNeeded = new Set()
-      if (projectData?.zones && projectData.zones.length > 0) {
-        projectData.zones.forEach(zone => {
-          if (zone.owner === 'player1') playersNeeded.add('player1')
-          if (zone.owner === 'player2') playersNeeded.add('player2')
-        })
-      }
-      
-      // If no zones specify players, default to 2-player game
-      if (playersNeeded.size === 0) {
-        playersNeeded.add('player1')
-        playersNeeded.add('player2')
-      }
-
-      // Get configured player resources or use empty
+      const playerCount = projectData?.gameConfig?.playerCount?.min || 2
       const configuredResources = projectData?.gameConfig?.initialSetup?.playerResources || {}
 
-      // Create only the players that are actually needed
-      const players = []
-      if (playersNeeded.has('player1')) {
-        players.push(createPlayer({
+      const players = Array.from({ length: playerCount }, (_, i) =>
+        createPlayer({
           id: createPlayerId(),
-          name: 'Player 1',
-          resources: { ...configuredResources } // Use configured resources
-        }))
-      }
-      if (playersNeeded.has('player2')) {
-        players.push(createPlayer({
-          id: createPlayerId(),
-          name: 'Player 2', 
-          resources: { ...configuredResources } // Use configured resources
-        }))
-      }
+          name: `Player ${i + 1}`,
+          resources: { ...configuredResources },
+        })
+      )
 
-      const player1 = players.find(p => p.name === 'Player 1')
-      const player2 = players.find(p => p.name === 'Player 2')
-
-      // Create zones from project data or use defaults
       let gameZones: Zone[] = []
-      const player1Zones: string[] = []
-      const player2Zones: string[] = []
-      
+      const playerZoneMap: { [key: string]: string[] } = {}
+      players.forEach(p => playerZoneMap[p.id.value] = [])
+
       if (projectData?.zones && projectData.zones.length > 0) {
-        // Use custom zones from Zone Designer
         gameZones = projectData.zones.map((template: ZoneTemplate) => {
-          const zone = createZoneFromTemplate(template, player1?.id, player2?.id)
-          
-          // Track zones for each player
-          if (template.owner === 'player1') {
-            player1Zones.push(zone.id.value)
-          } else if (template.owner === 'player2') {
-            player2Zones.push(zone.id.value)
+          const zone = createZoneFromTemplate(template, players)
+          if (zone.owner) {
+            playerZoneMap[zone.owner.value]?.push(zone.id.value)
           }
-          
           return zone
         })
-        
         addToGameLog('Custom Zones', `Loaded ${gameZones.length} custom zones from project`, 'system')
       }
 
-      // Create game cards from project data
       const gameCards: GameCard[] = projectData?.cards?.map(cardData => {
-        // Assign cards to available players
-        const availablePlayers = [player1, player2].filter(p => p !== undefined)
-        if (availablePlayers.length === 0) {
-          throw new Error('No players available for card assignment')
-        }
+        const ownerIndex = Math.floor(Math.random() * players.length)
+        const owner = players[ownerIndex].id
         
-        // Randomly assign to one of the available players, or use the first if only one
-        const owner = availablePlayers.length === 1 ? 
-          availablePlayers[0].id : 
-          (Math.random() > 0.5 ? availablePlayers[0].id : availablePlayers[1].id)
-        
-        // Find the appropriate deck zone for this owner
         const targetDeck = gameZones.find(z => z.owner?.value === owner.value && 'type' in z && (z as any).type === 'deck')
         const defaultZone = gameZones.find(z => z.owner?.value === owner.value) || gameZones[0]
         const currentZone = targetDeck?.id || defaultZone?.id || createZoneId()
-        
+
         return {
           id: createCardId(),
           name: cardData.name,
@@ -202,22 +156,11 @@ export default function GameBoard({ projectData }: GameBoardProps) {
         }
       }) || []
 
-      // Update players with their zones
-      const updatedPlayers = []
-      if (player1) {
-        updatedPlayers.push({
-          ...player1,
-          zones: player1Zones.map(zoneId => ({ value: zoneId }))
-        })
-      }
-      if (player2) {
-        updatedPlayers.push({
-          ...player2,
-          zones: player2Zones.map(zoneId => ({ value: zoneId }))
-        })
-      }
+      const updatedPlayers = players.map(p => ({
+        ...p,
+        zones: playerZoneMap[p.id.value].map(zoneId => ({ value: zoneId }))
+      }))
 
-      // Create the game
       const newGame = createGame({
         id: createGameId(),
         players: updatedPlayers,
@@ -232,13 +175,11 @@ export default function GameBoard({ projectData }: GameBoardProps) {
       // Compile visual rules from project data
       if (projectData?.rules && projectData.rules.length > 0) {
         try {
-          // Assume rules are stored as { nodes, edges } format
-          const rulesData = projectData.rules[0] // Take the first rules object
+          const rulesData = projectData.rules[0]
           if (rulesData && rulesData.nodes && rulesData.edges) {
             const compiled = RuleCompiler.compileAllRules(rulesData.nodes, rulesData.edges)
             setCompiledRules(compiled)
             
-            // Add compiled rules to event manager
             let newEventManager = createEventManager()
             compiled.forEach(rule => {
               newEventManager = subscribeToEvent(newEventManager, rule.eventListener)
@@ -579,9 +520,8 @@ export default function GameBoard({ projectData }: GameBoardProps) {
     )
   }
 
-  const player1 = game.players[0]
-  const player2 = game.players[1]
-  const currentPlayerName = game.currentPlayer === player1.id ? player1.name : player2.name
+  const currentPlayer = game.players.find(p => p.id.value === game.currentPlayer?.value)
+  const currentPlayerName = currentPlayer?.name || 'Unknown Player'
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-b from-green-50 to-green-100">
@@ -610,23 +550,13 @@ export default function GameBoard({ projectData }: GameBoardProps) {
           <div className="h-full flex flex-col gap-4">
             {/* Render Player Areas Dynamically */}
             {game.players.map((player, index) => (
-              <div key={player.id.value} className={`border rounded-lg p-4 ${
-                index === 0 ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'
-              }`}>
+              <div key={player.id.value} className="border rounded-lg p-4 bg-white/60">
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className={`font-semibold ${
-                    index === 0 ? 'text-red-800' : 'text-blue-800'
-                  }`}>{player.name}</h3>
-                  <div className={`text-sm ${
-                    index === 0 ? 'text-red-600' : 'text-blue-600'
-                  }`}>
-                    {Object.keys(player.resources).length > 0 ? (
-                      Object.entries(player.resources).map(([key, value]) => 
-                        `${key}: ${value}`
-                      ).join(' | ')
-                    ) : (
-                      'No resources defined'
-                    )}
+                  <h3 className="font-semibold text-gray-800">{player.name}</h3>
+                  <div className="text-sm text-gray-600">
+                    {Object.entries(player.resources).map(([key, value]) =>
+                      `${key}: ${value}`
+                    ).join(' | ') || 'No resources'}
                   </div>
                 </div>
                 <div className="grid grid-cols-4 gap-2 h-32">
@@ -640,7 +570,7 @@ export default function GameBoard({ projectData }: GameBoardProps) {
                         onCardAction={handleCardAction}
                         selectedCard={selectedCard}
                         onCardSelect={setSelectedCard}
-                        isTopPlayer={index > 0}
+                        isTopPlayer={index > 0} // This might need adjustment for multi-player layouts
                       />
                     ))}
                 </div>
@@ -692,12 +622,8 @@ export default function GameBoard({ projectData }: GameBoardProps) {
                       if (playerPlayAreas.length === 0) return null
                       
                       return (
-                        <div key={player.id.value} className={`border rounded p-2 ${
-                          index === 0 ? 'border-red-200' : 'border-blue-200'
-                        }`}>
-                          <p className={`text-xs mb-1 ${
-                            index === 0 ? 'text-red-600' : 'text-blue-600'
-                          }`}>{player.name}&apos;s Play Area</p>
+                        <div key={player.id.value} className="border rounded p-2 border-gray-200">
+                          <p className="text-xs mb-1 text-gray-600">{player.name}&apos;s Play Area</p>
                           {playerPlayAreas.map(zone => (
                             <ZoneComponent
                               key={zone.id.value}
