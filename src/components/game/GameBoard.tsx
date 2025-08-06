@@ -13,14 +13,14 @@ import { createEventManager, subscribeToEvent, publishEvent, processEvents } fro
 import { createGameEvent } from '@/core/events'
 import { createPlayerId, createZoneId, createGameId, createCardId } from '@/lib/utils'
 import { RuleCompiler, type CompiledRule } from '@/components/designer/RuleCompiler'
-import type { ZoneTemplate } from '@/types'
+import type { ZoneTemplate, CardTemplate } from '@/types'
 import ZoneComponent from './ZoneComponent'
 import GameLog from './GameLog'
 import StateDebugger from './StateDebugger'
 
 interface GameBoardProps {
   projectData?: {
-    cards: any[]
+    cards: CardTemplate[]
     rules: any[]
     zones?: ZoneTemplate[]
     name: string
@@ -98,31 +98,34 @@ export default function GameBoard({ projectData }: GameBoardProps) {
         addToGameLog('Custom Zones', `Loaded ${gameZones.length} zones from project templates`, 'system');
       }
 
-      const gameCards: GameCard[] = projectData?.cards?.map(cardData => {
-        const ownerIndex = Math.floor(Math.random() * players.length)
-        const owner = players[ownerIndex].id
-        
-        const targetDeck = gameZones.find(z => z.owner?.value === owner.value && 'type' in z && (z as any).type === 'deck')
-        const defaultZone = gameZones.find(z => z.owner?.value === owner.value) || gameZones[0]
-        const currentZone = targetDeck?.id || defaultZone?.id || createZoneId()
+      const gameCards: GameCard[] = projectData?.cards?.flatMap(cardTemplate => {
+        const copies = cardTemplate.copies || 1;
+        return Array.from({ length: copies }, () => {
+          const ownerIndex = Math.floor(Math.random() * players.length);
+          const owner = players[ownerIndex].id;
 
-        return {
-          id: createCardId(),
-          name: cardData.name,
-          text: cardData.text,
-          type: cardData.type,
-          owner,
-          currentZone,
-          properties: {
-            cost: cardData.cost || 0,
-            power: cardData.power || 0,
-            toughness: cardData.toughness || 0,
-            ...cardData.properties
-          },
-          counters: [],
-          isTapped: false
-        }
-      }) || []
+          const targetDeck = gameZones.find(z => z.owner?.value === owner.value && 'type' in z && (z as any).type === 'deck');
+          const defaultZone = gameZones.find(z => z.owner?.value === owner.value) || gameZones[0];
+          const currentZone = targetDeck?.id || defaultZone?.id || createZoneId();
+
+          return {
+            id: createCardId(),
+            name: cardTemplate.name,
+            text: cardTemplate.text,
+            type: cardTemplate.type,
+            owner,
+            currentZone,
+            properties: {
+              cost: cardTemplate.cost || 0,
+              power: cardTemplate.power || 0,
+              toughness: cardTemplate.toughness || 0,
+              ...cardTemplate.properties
+            },
+            counters: [],
+            isTapped: false
+          };
+        });
+      }) || [];
 
       const updatedPlayers = players.map(p => ({
         ...p,

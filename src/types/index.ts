@@ -248,12 +248,25 @@ export interface User {
   readonly subscriptionTier: 'free' | 'pro';
 }
 
+// Card Template for Designer (used in Card Designer and GameProject)
+export interface CardTemplate {
+  readonly id: string;
+  readonly name: string;
+  readonly text: string;
+  readonly type: string;
+  readonly cost: number;
+  readonly power?: number;
+  readonly toughness?: number;
+  readonly properties: Record<string, any>;
+  readonly copies: number;
+}
+
 export interface GameProject {
   readonly id: string;
   readonly name: string;
   readonly description: string;
   readonly ownerUid: string;
-  readonly cards: Card[];
+  readonly cards: CardTemplate[];
   readonly rules: GameRule[];
   readonly zones?: ZoneTemplate[];
   readonly gameConfig?: GameConfiguration;
