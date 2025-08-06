@@ -100,17 +100,15 @@ export function GameConfigPanel({ gameConfig, onConfigChange }: GameConfigPanelP
     }
   }
 
-  const updatePlayerCount = (updates: Partial<NonNullable<GameConfiguration['playerCount']>>) => {
-    const newPlayerCount = {
-      ...config.playerCount,
-      ...updates,
-    }
-    if (!newPlayerCount.min) newPlayerCount.min = 2;
-    if (!newPlayerCount.max) newPlayerCount.max = 2;
-
+  const updatePlayerCount = (updates: Partial<GameConfiguration['playerCount']>) => {
     updateConfig({
       ...config,
-      playerCount: newPlayerCount
+      playerCount: {
+        min: 2,
+        max: 2,
+        ...config.playerCount,
+        ...updates,
+      },
     })
   }
 

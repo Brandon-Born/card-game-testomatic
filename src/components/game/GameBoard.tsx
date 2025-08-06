@@ -613,7 +613,7 @@ export default function GameBoard({ projectData }: GameBoardProps) {
                     ))}
                     
                     {/* Player play areas */}
-                    {game.players.map((player, index) => {
+                    {game.players.map((player) => {
                       const playerPlayAreas = game.zones.filter(zone => 
                         zone.owner?.value === player.id.value && 
                         (zone.name === 'PlayArea' || zone.name === 'Play Area' || zone.name.toLowerCase().includes('play'))
