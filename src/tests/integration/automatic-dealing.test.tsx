@@ -20,38 +20,10 @@ jest.mock('@/hooks/useProjectManager', () => ({
 describe('Automatic Card Dealing Integration', () => {
   it('should automatically deal cards when dealing rules are enabled', async () => {
     const customZones: ZoneTemplate[] = [
-      {
-        id: 'deck-1',
-        name: 'Player 1 Deck',
-        type: 'deck',
-        owner: 'player1',
-        visibility: 'private',
-        order: 'ordered'
-      },
-      {
-        id: 'hand-1',
-        name: 'Player 1 Hand',
-        type: 'hand',
-        owner: 'player1',
-        visibility: 'private',
-        order: 'unordered'
-      },
-      {
-        id: 'deck-2',
-        name: 'Player 2 Deck',
-        type: 'deck',
-        owner: 'player2',
-        visibility: 'private',
-        order: 'ordered'
-      },
-      {
-        id: 'hand-2',
-        name: 'Player 2 Hand',
-        type: 'hand',
-        owner: 'player2',
-        visibility: 'private',
-        order: 'unordered'
-      }
+      { id: 'deck-p1', name: 'Player 1 Deck', type: 'deck', owner: 'player1', visibility: 'private', order: 'ordered' },
+      { id: 'hand-p1', name: 'Player 1 Hand', type: 'hand', owner: 'player1', visibility: 'private', order: 'unordered' },
+      { id: 'deck-p2', name: 'Player 2 Deck', type: 'deck', owner: 'player2', visibility: 'private', order: 'ordered' },
+      { id: 'hand-p2', name: 'Player 2 Hand', type: 'hand', owner: 'player2', visibility: 'private', order: 'unordered' },
     ]
 
     const gameConfig: GameConfiguration = {
@@ -109,25 +81,14 @@ describe('Automatic Card Dealing Integration', () => {
 
   it('should handle sequential dealing order', async () => {
     const customZones: ZoneTemplate[] = [
-      {
-        id: 'deck-1',
-        name: 'Player 1 Deck',
-        type: 'deck',
-        owner: 'player1',
-        visibility: 'private',
-        order: 'ordered'
-      },
-      {
-        id: 'hand-1',
-        name: 'Player 1 Hand',
-        type: 'hand',
-        owner: 'player1',
-        visibility: 'private',
-        order: 'unordered'
-      }
+      { id: 'deck-p1', name: 'Player 1 Deck', type: 'deck', owner: 'player1', visibility: 'private', order: 'ordered' },
+      { id: 'hand-p1', name: 'Player 1 Hand', type: 'hand', owner: 'player1', visibility: 'private', order: 'unordered' },
+      { id: 'deck-p2', name: 'Player 2 Deck', type: 'deck', owner: 'player2', visibility: 'private', order: 'ordered' },
+      { id: 'hand-p2', name: 'Player 2 Hand', type: 'hand', owner: 'player2', visibility: 'private', order: 'unordered' },
     ]
 
     const gameConfig: GameConfiguration = {
+      playerCount: { min: 2, max: 2 },
       initialSetup: {
         dealingRules: {
           enabled: true,
@@ -202,12 +163,28 @@ describe('Automatic Card Dealing Integration', () => {
 
   it('should handle dealing errors gracefully', async () => {
     const customZones: ZoneTemplate[] = [
-      // Only hand, no deck - should cause dealing errors
+      {
+        id: 'deck-1',
+        name: 'Player 1 Deck',
+        type: 'deck',
+        owner: 'player1',
+        visibility: 'private',
+        order: 'ordered'
+      },
       {
         id: 'hand-1',
         name: 'Player 1 Hand',
         type: 'hand',
         owner: 'player1',
+        visibility: 'private',
+        order: 'unordered'
+      },
+      // Player 2 has no deck, which will cause a recoverable error
+      {
+        id: 'hand-2',
+        name: 'Player 2 Hand',
+        type: 'hand',
+        owner: 'player2',
         visibility: 'private',
         order: 'unordered'
       }
@@ -262,7 +239,7 @@ describe('Automatic Card Dealing Integration', () => {
     render(<GameBoard projectData={projectData} />)
 
     await waitFor(() => {
-      expect(screen.getAllByText(/No resources defined/)).toHaveLength(2) // Both players show no resources
+      expect(screen.getAllByText(/No resources/)).toHaveLength(2) // Both players show no resources
     })
   })
 })

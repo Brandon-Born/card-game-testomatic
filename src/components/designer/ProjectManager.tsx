@@ -18,14 +18,15 @@ import {
   AlertCircle,
   X 
 } from 'lucide-react'
-import type { ZoneTemplate } from '@/types'
+
+import type { ZoneTemplate, GameConfiguration } from '@/types'
 
 interface ProjectManagerProps {
   currentCards: any[]
   currentRules: any[]
   currentZones: ZoneTemplate[]
-  currentGameConfig?: any
-  onProjectLoad: (project: { cards: any[], rules: any[], zones?: ZoneTemplate[], gameConfig?: any }) => void
+  gameConfig?: GameConfiguration
+  onProjectLoad: (project: { cards: any[], rules: any[], zones?: ZoneTemplate[], gameConfig?: GameConfiguration }) => void
   onNewProject: () => void
 }
 
@@ -33,7 +34,7 @@ export function ProjectManager({
   currentCards, 
   currentRules, 
   currentZones,
-  currentGameConfig,
+  gameConfig,
   onProjectLoad, 
   onNewProject 
 }: ProjectManagerProps) {
@@ -83,7 +84,7 @@ export function ProjectManager({
       cards: currentCards,
       rules: currentRules,
       zones: currentZones,
-      gameConfig: currentGameConfig,
+      gameConfig: gameConfig,
     })
 
     if (saved) {
@@ -98,7 +99,7 @@ export function ProjectManager({
         cards: project.cards || [],
         rules: project.rules || [],
         zones: project.zones || [],
-        gameConfig: project.gameConfig || null,
+        gameConfig: project.gameConfig,
       })
       setShowLoadDialog(false)
     }

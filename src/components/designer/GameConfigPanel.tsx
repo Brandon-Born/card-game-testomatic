@@ -24,6 +24,10 @@ interface GameConfigPanelProps {
 
 export function GameConfigPanel({ gameConfig, onConfigChange }: GameConfigPanelProps) {
   const [config, setConfig] = useState<GameConfiguration>({
+    playerCount: {
+      min: 2,
+      max: 2,
+    },
     initialSetup: {
       dealingRules: {
         enabled: false,
@@ -96,11 +100,65 @@ export function GameConfigPanel({ gameConfig, onConfigChange }: GameConfigPanelP
     }
   }
 
+  const updatePlayerCount = (updates: Partial<GameConfiguration['playerCount']>) => {
+    updateConfig({
+      ...config,
+      playerCount: {
+        min: 2,
+        max: 2,
+        ...config.playerCount,
+        ...updates,
+      },
+    })
+  }
+
   const dealingConfig = config.initialSetup?.dealingRules
   const playerResources = config.initialSetup?.playerResources || {}
+  const playerCount = config.playerCount || { min: 2, max: 2 }
 
   return (
     <div className="space-y-6">
+      {/* Player Count Configuration */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Player Count
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label htmlFor="min-players">Minimum Players</Label>
+              <Input
+                id="min-players"
+                type="number"
+                min="1"
+                max="8"
+                value={playerCount.min}
+                onChange={(e) => updatePlayerCount({ min: parseInt(e.target.value) || 1 })}
+                className="w-24"
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="max-players">Maximum Players</Label>
+              <Input
+                id="max-players"
+                type="number"
+                min={playerCount.min}
+                max="8"
+                value={playerCount.max}
+                onChange={(e) => updatePlayerCount({ max: parseInt(e.target.value) || playerCount.min })}
+                className="w-24"
+              />
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Define the range of players your game supports. The simulator will launch with the minimum number.
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Card Dealing Configuration */}
       <Card>
         <CardHeader>

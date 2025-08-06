@@ -119,7 +119,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const { name, description, cards, rules, zones } = body
+    const { name, description, cards, rules, zones, gameConfig } = body
 
     // Update project in Firestore using Admin SDK
     const projectRef = adminDb.collection('projects').doc(id)
@@ -143,6 +143,7 @@ export async function PUT(
     if (cards !== undefined) updateData.cards = cards
     if (rules !== undefined) updateData.rules = rules
     if (zones !== undefined) updateData.zones = zones
+    if (gameConfig !== undefined) updateData.gameConfig = gameConfig
 
     await projectRef.update(updateData)
 

@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { RuleDesigner } from '@/components/designer'
+import { RuleDesigner, GameConfigPanel } from '@/components/designer'
 import { CardDesigner } from '@/components/designer/CardDesigner'
 import { ZoneDesigner } from '@/components/designer/ZoneDesigner'
-import type { ZoneTemplate } from '@/types'
+import type { ZoneTemplate, GameConfiguration } from '@/types'
 import { ProjectManager } from '@/components/designer/ProjectManager'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
@@ -21,21 +21,29 @@ export default function DesignerPage() {
   const [currentCards, setCurrentCards] = useState<any[]>([])
   const [currentRules, setCurrentRules] = useState<any[]>([])
   const [currentZones, setCurrentZones] = useState<ZoneTemplate[]>([])
+  const [gameConfig, setGameConfig] = useState<GameConfiguration>({
+    playerCount: { min: 2, max: 2 },
+    initialSetup: {
+      dealingRules: { enabled: false, handSize: 7 },
+    },
+  })
 
   const handleSignOut = async () => {
     await signOut()
   }
 
-  const handleProjectLoad = (project: { cards: any[], rules: any[], zones?: ZoneTemplate[] }) => {
+  const handleProjectLoad = (project: { cards: any[], rules: any[], zones?: ZoneTemplate[], gameConfig?: GameConfiguration }) => {
     setCurrentCards(project.cards)
     setCurrentRules(project.rules)
     setCurrentZones(project.zones || [])
+    setGameConfig(project.gameConfig || { playerCount: { min: 2, max: 2 }, initialSetup: { dealingRules: { enabled: false, handSize: 7 } } })
   }
 
   const handleNewProject = () => {
     setCurrentCards([])
     setCurrentRules([])
     setCurrentZones([])
+    setGameConfig({ playerCount: { min: 2, max: 2 }, initialSetup: { dealingRules: { enabled: false, handSize: 7 } } })
   }
 
   return (
@@ -62,6 +70,7 @@ export default function DesignerPage() {
                   currentCards={currentCards}
                   currentRules={currentRules}
                   currentZones={currentZones}
+                  gameConfig={gameConfig}
                   onProjectLoad={handleProjectLoad}
                   onNewProject={handleNewProject}
                 />
@@ -83,10 +92,11 @@ export default function DesignerPage() {
         {/* Main content */}
         <div className="flex-1">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-            <TabsList className="grid w-full grid-cols-3 bg-white border-b">
+            <TabsList className="grid w-full grid-cols-4 bg-white border-b">
               <TabsTrigger value="rules">Rules Designer</TabsTrigger>
               <TabsTrigger value="cards">Card Designer</TabsTrigger>
               <TabsTrigger value="zones">Zone Designer</TabsTrigger>
+              <TabsTrigger value="config">Game Configuration</TabsTrigger>
             </TabsList>
             
             <TabsContent value="rules" className="h-[calc(100vh-120px)] m-0">
@@ -107,6 +117,13 @@ export default function DesignerPage() {
               <ZoneDesigner 
                 zones={currentZones}
                 onZonesChange={setCurrentZones}
+              />
+            </TabsContent>
+
+            <TabsContent value="config" className="h-[calc(100vh-120px)] m-0 p-6 bg-gray-100 overflow-y-auto">
+              <GameConfigPanel
+                gameConfig={gameConfig}
+                onConfigChange={setGameConfig}
               />
             </TabsContent>
           </Tabs>

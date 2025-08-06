@@ -79,6 +79,10 @@ export interface ZoneTemplate {
 
 // Game Configuration for project-driven setup
 export interface GameConfiguration {
+  readonly playerCount?: {
+    readonly min: number;
+    readonly max: number;
+  };
   readonly initialSetup?: {
     readonly dealingRules?: {
       readonly enabled: boolean;

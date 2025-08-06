@@ -109,6 +109,31 @@ interface Game {
 
 **Test Coverage:** 45 tests covering all management functions and state queries.
 
+### GameConfiguration Object
+```typescript
+interface GameConfiguration {
+  readonly playerCount?: {
+    readonly min: number;
+    readonly max: number;
+  };
+  readonly initialSetup?: {
+    readonly dealingRules?: {
+      readonly enabled: boolean;
+      readonly handSize: number;
+      readonly shuffleDeck?: boolean;
+      readonly dealingOrder?: 'sequential' | 'round-robin';
+    };
+    readonly playerResources?: {
+      readonly [key: string]: number;
+    };
+  };
+}
+```
+**Capabilities:**
+- **Player Count:** Define the minimum and maximum number of players for a game.
+- **Initial Dealing:** Automate card dealing at the start of the game, including hand size and shuffling.
+- **Starting Resources:** Pre-configure the resources each player starts with, such as life, mana, or chips.
+
 ## Action Library
 
 The Action Library provides immutable functions that manipulate game state. All actions validate prerequisites and provide detailed error messages.

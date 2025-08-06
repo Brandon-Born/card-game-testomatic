@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, description, cards = [], rules = [], zones = [] } = body
+    const { name, description, cards = [], rules = [], zones = [], gameConfig = {} } = body
 
     if (!name) {
       return NextResponse.json({ error: 'Project name is required' }, { status: 400 })
@@ -114,6 +114,7 @@ export async function POST(request: NextRequest) {
       cards,
       rules,
       zones,
+      gameConfig,
       ownerUid: uid,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
